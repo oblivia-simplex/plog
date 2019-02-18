@@ -5,6 +5,7 @@ body {
 a {
     color: pink;
     text-decoration: none;
+    font-weight: bold;
 }
 a:hover {
     color: hotpink;
@@ -18,18 +19,36 @@ pre {
 .container {
     width: 85vw; margin: 0 auto;
     overflow: hidden;
-    font-family:monospace;
-    line-height: 175%
+}
+
+h1 {
+    font-family: Garamond;
+    line-height: 120%
+}
+
+h2 {
+    font-family: Garamond;
+}
+
+h3 {
+    font-family: Garamond;
 }
 
 #main {
     float: left;
-    width: 100%;
+    width: 80%;
     font-size: 130%;
+    font-family: Courier;
+    line-height: 150%
 }
 
 #toc_author {
     font-size: 55%;
     line-height: 75%;
+    font-family: Garamond;
     color: #444444;
+}
+
+#toc_title {
+    font-weight: bold;
 }

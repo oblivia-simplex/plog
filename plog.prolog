@@ -61,10 +61,10 @@ serve_markdown(Request) :-
 
 % Table of Contents
 toc_entry_to_html([Filename, Title, Author, Abstract],
-                  [li(a(href=MdPath, Title)),
+                  [li(class(toc_title), a(href=MdPath, Title)),
                    div(class(toc_author),
                        ['by ', Author]),
-                   p(Abstract)]) :-
+                   p(class(toc_abstract), Abstract)]) :-
     atom_concat('./md/', Filename, MdPath).
 
 make_toc(Path, Blocks) :-
