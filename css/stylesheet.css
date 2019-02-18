@@ -27,3 +27,9 @@ pre {
     width: 100%;
     font-size: 130%;
 }
+
+#toc_author {
+    font-size: 55%;
+    line-height: 75%;
+    color: #444444;
+}
