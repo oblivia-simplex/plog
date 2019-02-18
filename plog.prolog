@@ -60,8 +60,8 @@ serve_markdown(Request) :-
 
 
 % Table of Contents
-toc_entry_to_html([Filename, Title, Abstract],
-                  [li(a(href=MdPath, Title)), p(Abstract)]) :-
+toc_entry_to_html([Filename, Title, Author, Abstract],
+                  [li(a(href=MdPath, Title)), p(Author), p(Abstract)]) :-
     atom_concat('./md/', Filename, MdPath).
 
 make_toc(Path, Blocks) :-
