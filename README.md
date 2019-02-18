@@ -21,6 +21,8 @@ in the future.
 
 Install this with
 ```
-:- pack_install(http://packs.rlaanemets.com/markdown/markdown-0.0.2.tgz).
+:- pack_install('http://packs.rlaanemets.com/markdown/markdown-0.0.2.tgz').
 ```
 from your `swipl` REPL.
+
+
