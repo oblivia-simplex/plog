@@ -25,4 +25,10 @@ Install this with
 ```
 from your `swipl` REPL.
 
+## To Run
+To serve on port 8000, run:
+```
+$ swipl plog.prolog
 
+:- server(8000). 
+```
