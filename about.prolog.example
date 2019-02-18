@@ -1,4 +1,4 @@
-:- module(about_example, [about/2]).
+:- module(about, [about/3]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Put your blog's information here %%
