@@ -16,3 +16,11 @@ SSH. I don't see any need to complicate that any further.
 Maybe I'll figure out a neat way of integrating comments, etc., 
 in the future. 
 
+## Dependencies
+[Raivo Laanemets' Markdown Pack, for SWI Prolog](http://packs.rlaanemets.com/markdown/markdown-0.0.2.tgz)
+
+Install this with
+```
+:- pack_install(http://packs.rlaanemets.com/markdown/markdown-0.0.2.tgz).
+```
+from your `swipl` REPL.
