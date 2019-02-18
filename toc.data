@@ -1,13 +1,17 @@
 [
-    ['001.Oliandra_backstory.md',
-     'Oliandra\'s Story',
-     'Vivienne',
-     'A brief biography of Oliandra Beaumont d\'Cannith, dealing with her life prior to
-     joining the party.'], 
-    
-    ['101.karlak_log.md',
-     'Major Wilston Karlak\'s Travel Log, 4th of Therendor, 998 YK',
-     'Lucca',
-     'In which our major details the events that befell the party on the train to Gatherhold.']
+
+entry(file('001.Oliandra_backstory.md'),
+      title('Oliandra Backstory'),
+      author('Vivienne'),
+      date('2019-02-05'),
+      abstract('A brief biography of Oliandra Beaumont d\'Cannith, dealing with
+      her life prior to joining the party.')),
+
+entry(file('101.karlak_log.md'),
+      title('Travel Log of Major Wilston Karlak, 4th of Therendor'),
+      author('Lucca'),
+      date('2019-01-25'),
+      abstract('In which our major details the events that befell the party on
+      the train to Gatherhold.'))
 
 ].

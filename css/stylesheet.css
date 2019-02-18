@@ -17,7 +17,8 @@ pre {
 }
 
 .container {
-    width: 85vw; margin: 0 auto;
+    width: 85vw;
+    margin: 0 auto;
     overflow: hidden;
 }
 
@@ -35,9 +36,11 @@ h3 {
 }
 
 #main {
-    float: left;
-    width: 80%;
-    font-size: 130%;
+    float: none;
+    width: 74%;
+    margin-left: 12%;
+    margin-right: 12%;
+    font-size: 120%;
     font-family: Courier;
     line-height: 150%
 }
