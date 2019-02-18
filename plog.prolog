@@ -15,7 +15,7 @@
 %% Some easily tuned facts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-the_title('Campaign Logs').
+:- use_module(about); use_module(about_example).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -23,20 +23,26 @@ the_title('Campaign Logs').
 :- dynamic   http:location/3.
 :- multifile user:body//2.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% This predicate starts the server in the background, and returns
+% to the toplevel, so that you can reload and debug the code, etc.
+server(Port) :-
+    http_server(http_dispatch, [port(Port)]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 http:location(static, '/static', []).
 http:location(css, root(css), []).
 http:location(md, root(md), []).
 http:location(data, './data', []).
+http:location(img, root(img), []).
+:- html_resource(css('stylesheet.css'), []).
 
-:- http_handler(css(.), serve_css, [prefix]).
-
-serve_css(Request) :-
-    http_reply_from_files(css, [], Request).
-
-serve_css(Request) :-
-    http_404([], Request).
-
+:- http_handler(css(.), http_reply_from_files(css, []), [prefix]).
+:- http_handler(img(.), http_reply_from_files(img, []), [prefix]).
 :- http_handler(md(.), serve_markdown, [prefix]).
+:- http_handler(root(.), display_toc, []).
 
 validate_file(Path) :-
     exists_file(Path).
@@ -83,42 +89,31 @@ make_toc(Path, Blocks) :-
     flatten(BlockLists, Blocks).
 
 
-
-:- html_resource(css('stylesheet.css'), []).
-
-% This predicate starts the server in the background, and returns
-% to the toplevel, so that you can reload and debug the code, etc.
-server(Port) :-
-    http_server(http_dispatch, [port(Port)]).
-
-:- http_handler(root(.), display_toc, []).
-
 % the reply_html_page predicate takes care of a lot of this for us.
 display_toc(_Request) :-
     make_toc('toc.data', ToC),
-    the_title(Title),
+    about(title(Title),_,_),
     reply_html_page(
         my_style,
         [title(Title)],
-        [h1(Title),
-         \toc_page_content(ToC)]).
+        [\toc_page_content(ToC)]).
 
 toc_page_content(ToC) -->
-    html(
-        [
-            ul(ToC)
-        ]
-    ).
+    html([ul(class(toc), ToC)]).
 
 user:body(my_style, Body) -->
-    html(body([
-                     div(class(container),
-                         div(id(main),
-                            Body))
-                 ])).
+    {about(title(Title),admin(_Admin),abstract(Abstract))},
+    html(body([div(class(container),
+                   [div(id(main),
+                        [h1(Title),
+                         hr(_),
+                         p(class(abstract), Abstract),
+                         hr(_),
+                         Body])])])).
 
 user:head(my_style, Head) -->
-    html(head([title('Fancy Ass Title'),
+    {about(title(Title),_,_)},
+    html(head([title(Title),
                \html_requires(css('stylesheet.css')),
                Head])).
 

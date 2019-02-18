@@ -32,3 +32,7 @@ $ swipl plog.prolog
 
 :- server(8000). 
 ```
+
+## Example Files
+Before using, the `*.example` files should, at the very least, be copied
+to filenames where the `.example` suffix is dropped.

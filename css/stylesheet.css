@@ -45,13 +45,22 @@ h3 {
     line-height: 150%
 }
 
-#toc_author {
-    font-size: 55%;
-    line-height: 75%;
-    font-family: Garamond;
-    color: #444444;
+.toc {
+    height: 90%;
+    overflow-y: auto;
 }
 
-#toc_title {
+.toc_author {
+    font-size: 75%;
+    line-height: 100%;
+    color: #8d8e8c;
+}
+
+.toc_title {
     font-weight: bold;
+}
+
+.abstract {
+    font-weight: bold;
+    color: #8d8e8c
 }
