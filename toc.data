@@ -3,6 +3,11 @@
 entry(file('hello.md'),
       title('Hello, World'),
       author(me),
-      abstract('Nothing really at all.'))
+      abstract('Nothing really at all.')),
+
+entry(file('blah.md'),
+      title('I do not know'),
+      author(me),
+      abstract('Just testing date stamps for uncommitted files'))
 
 ].

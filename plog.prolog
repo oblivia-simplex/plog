@@ -17,6 +17,7 @@
 
 :- use_module(about).
 :- use_module(git).
+:- use_module(rss).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -36,17 +37,23 @@ server(Port) :-
 http:location(static, '/static', []).
 http:location(css, root(css), []).
 http:location(posts, root(posts), []).
-http:location(data, './data', []).
 http:location(img, root(img), []).
 :- html_resource(css('stylesheet.css'), []).
+:- html_resource(root('favicon.ico'), []).
 
 :- http_handler(css(.), http_reply_from_files(css, []), [prefix]).
 :- http_handler(img(.), http_reply_from_files(img, []), [prefix]).
 :- http_handler(posts(.), serve_markdown, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
-                http_reply_from_files(root, []),
-                [prefix]).
+                http_reply_file('favicon.ico', []),
+                []).
+:- http_handler('/feed', serve_rss, [prefix]).
+
+serve_rss(_Request) :-
+    make_rss(RSS),
+    format('Content-Type: application/xml~n~n~s~n', RSS).
+
 
 validate_file(Path) :-
     exists_file(Path).
@@ -71,6 +78,10 @@ serve_markdown(Request) :-
 resolve_author(me, Me) :- about(_,admin(Me),_,_).
 resolve_author(X,X).
 
+pretty_date(IsoDate, PrettyDate) :-
+    parse_time(IsoDate, Timestamp),
+    format_time(atom(PrettyDate), "%F", Timestamp).
+
 % Table of Contents
 toc_entry_to_html(entry(file(Filename),
                         title(Title),
@@ -78,13 +89,14 @@ toc_entry_to_html(entry(file(Filename),
                         abstract(Abstract)),
                   [li(class(toc_title), a(href=MdPath, Title)),
                    div(class(toc_author),
-                       ['by ', ResolvedAuthor, ', ', PrettyDate]),
+                       ['by ', ResolvedAuthor, ' (', PrettyDate, ')']),
                    p(class(toc_abstract), Abstract)]) :-
     resolve_author(Author, ResolvedAuthor),
     atom_concat('./posts/', Filename, MdPath),
     %% Try to parse the date, but fail gracefully if unable to, and
     %% just return the original date atom unaltered.
-    (last_build_date_of_file(MdPath, PrettyDate);
+    (last_build_date_of_file(MdPath, IsoDate),
+     pretty_date(IsoDate, PrettyDate);
      PrettyDate = uncommitted).
 
 make_toc(Path, Blocks) :-
@@ -136,6 +148,7 @@ nav_bar -->
 
 nav('Home', /).
 nav('About', '/posts/about.md').
+nav('RSS', '/feed').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).

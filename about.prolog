@@ -5,6 +5,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 about(title('Put Your Title Here, in about.prolog'),
-      admin('Put Your Name Here, in about.prolog'),
-      domain('www.hatever.it.is'),
+      admin('Put Your Name Here'),
+      domain('localhost:8000'),
       abstract('Put your abstract in about.prolog.')).
