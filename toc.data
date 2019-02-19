@@ -1,0 +1,8 @@
+[
+
+entry(file('hello.md'),
+      title('Hello, World'),
+      author(me),
+      abstract('Nothing really at all.'))
+
+].
