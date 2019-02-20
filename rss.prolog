@@ -3,6 +3,30 @@
 :- use_module('content/about').
 :- use_module(git).
 
+escape_char([], []).
+% & --> &amp;
+escape_char([0x26 | Tail], [[0x26, 0x61, 0x6d, 0x70, 0x3b] | Esc]) :-
+    escape_char(Tail, Esc).
+% < --> &lt;
+escape_char([0x3c | Tail], [[0x26, 0x6c, 0x74, 0x3b] | Esc]) :-
+    escape_char(Tail, Esc).
+% > --> &gt;
+escape_char([0x3e | Tail], [[0x26, 0x67, 0x74, 0x3b] | Esc]) :-
+    escape_char(Tail, Esc).
+% " --> &quot;
+escape_char([0x22 | Tail], [[0x26, 0x71, 0x75, 0x6f, 0x74, 0x3b] | Esc]) :-
+    escape_char(Tail, Esc).
+% ' --> &apos;
+escape_char([0x27 | Tail], [[0x26, 0x61, 0x70, 0x6f, 0x73, 0x3b] | Esc]) :-
+    escape_char(Tail, Esc).
+% and the rest is unchanged
+escape_char([A | Tail], [A | Esc]) :- escape_char(Tail, Esc).
+
+escape_xml_atom(Atom, Escaped) :-
+    name(Atom, Code),
+    escape_char(Code, Chunks),
+    flatten(Chunks, EscapedCode),
+    name(Escaped, EscapedCode).
 
 rfc2822_date(IsoDate, Rfc2822Date) :-
     parse_time(IsoDate, Timestamp),
@@ -27,10 +51,13 @@ rss_xml_header([
                       '<description>', Description, '</description>',
                       '<lastBuildDate>', LastBuildDate, '</lastBuildDate>'
                   ]) :-
-    about(title(Title),
+    about(title(UnescTitle),
           admin(_),
-          domain(Domain),
-          abstract(Description)),
+          domain(UnescDomain),
+          abstract(UnescDesc)),
+    escape_xml_atom(UnescTitle, Title),
+    escape_xml_atom(UnescDomain, Domain),
+    escape_xml_atom(UnescDesc, Description),
     atomic_list_concat(['//', Domain, '/'], Link),
     build_date(LastBuildDate).
 
@@ -38,10 +65,10 @@ rss_xml_header([
 rss_xml_footer(['</channel>', '</rss>']).
 
 
-rss_item(entry(file(Basename),
-               title(Title),
+rss_item(entry(file(UnescBasename),
+               title(UnescTitle),
                author(_),
-               abstract(Description)),
+               abstract(UnescDesc)),
          [
              '<item>',
              '<title>', Title, '</title>',
@@ -51,6 +78,9 @@ rss_item(entry(file(Basename),
              '<pubDate>', PubDate, '</pubDate>',
              '</item>'
          ]) :-
+    escape_xml_atom(UnescBasename, Basename),
+    escape_xml_atom(UnescTitle, Title),
+    escape_xml_atom(UnescDesc, Description),
     about(_,_,domain(Domain),_),
     atomic_list_concat(['http://', Domain, '/content/posts/', Basename], Link),
     Guid = Link,
