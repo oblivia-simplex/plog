@@ -49,11 +49,11 @@ user:file_search_path(data, './content/data').
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
 
-:- http_handler(css(.), http_reply_from_files(css, []), [prefix]).
+:- http_handler(css(.), http_reply_from_files('./content/css', []), [prefix]).
 
-:- http_handler(img(.), http_reply_from_files(img, []), [prefix]).
+:- http_handler(img(.), http_reply_from_files('./content/img', []), [prefix]).
 
-:- http_handler(data(.), http_reply_from_files(data, []), [prefix]).
+:- http_handler(data(.), http_reply_from_files('./content/data', []), [prefix]).
 
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 
