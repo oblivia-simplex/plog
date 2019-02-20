@@ -65,7 +65,9 @@ and work from there, until things look the way you'd like.
 The `favicon.ico` can be found in `content/img`, which is where any images linked
 to from your posts should also be stored. The links should be like so:
 
-[look at this fucking mindflayer](/content.example/img/mindflayer.gif)
+```
+![look at this mindflayer](/content/img/mindflayer.gif)
+```
 
 Metadata for your blog should go in `content/about.prolog`. The syntax used
 there should be fairly self-explanatory. 
