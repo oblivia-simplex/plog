@@ -15,8 +15,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- use_module(content/about).
-:- use_module(git).
+% :- use_module(content/about).
+:- use_module(timestamp).
 :- use_module(rss).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,14 +95,14 @@ serve_markdown(Request, Location) :-
     md_parse_file(Path, Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
-serve_markdown(Request) :-
-    user:file_search_path(posts, PostDir),
+serve_markdown(Request, Location) :-
+    user:file_search_path(Location, PostDir),
     http_reply_from_files(PostDir, [], Request).
 
-serve_markdown(Request) :-
+serve_markdown(Request, _) :-
     http_404([], Request).
 
-resolve_author(me, Me) :- about(_,admin(Me),_,_).
+resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
 
 pretty_date(IsoDate, PrettyDate) :-
@@ -138,7 +138,7 @@ make_toc(Path, Blocks) :-
 % the reply_html_page predicate takes care of a lot of this for us.
 display_toc(_Request) :-
     make_toc('content/toc.data', ToC),
-    about(title(Title),_,_,_),
+    content:about:title(Title),
     reply_html_page(
         my_style,
         [title(Title)],
@@ -148,7 +148,10 @@ toc_page_content(ToC) -->
     html([ul(class(toc), ToC)]).
 
 user:body(my_style, Body) -->
-    {about(title(Title),admin(_),domain(_),abstract(Abstract))},
+    {
+        content:about:title(Title),
+        content:about:abstract(Abstract)
+    },
     html(body([div(class(container),
                    [div(id(main),
                         [h1(Title),
@@ -160,7 +163,9 @@ user:body(my_style, Body) -->
                          Body])])])).
 
 user:head(my_style, Head) -->
-    {about(title(Title),_,_,_)},
+    {
+        content:about:title(Title)
+    },
     html(head([title(Title),
                \html_requires(css('stylesheet.css')),
                Head])).
@@ -183,6 +188,8 @@ nav('Storage', '/content/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/content/info/gpl.md').
+%nav('Email', Mailto) :-
+    
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).
