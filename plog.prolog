@@ -66,7 +66,8 @@ user:file_search_path(data, './content/data').
                 []).
 
 :- http_handler('/robots.txt',
-                http_reply_file('./content/info/robots.txt', [])).
+                http_reply_file('./content/info/robots.txt', []),
+                []).
 
 :- http_handler('/feed', serve_rss, [prefix]).
 
