@@ -188,8 +188,28 @@ nav('Storage', '/content/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/content/info/gpl.md').
-%nav('Email', Mailto) :-
-    
+nav('Contact', '/content/info/contact.md').
+ 
+%%
+% Consider replacing this with a javascript obfuscator
+% one that ROT13s the email address, e.g.
+%%
+%% gently_obfuscate_codes([],[]).
+%% gently_obfuscate_codes([C|CTail], [Ob|ObTail]) :-
+%%     number_codes(C,Ncodes),
+%%     Ob_ = [0x26,0x23|Ncodes],
+%%     append(Ob_, [0x3b], Ob),
+%%     gently_obfuscate_codes(CTail, ObTail).
+
+%% gently_obfuscate(Clear, Obf) :-
+%%     name(Clear, Codes),
+%%     gently_obfuscate_codes(Codes, ObCodes),
+%%     flatten(ObCodes, FlatObCodes),
+%%     append([0x22], FlatObCodes, Q1),
+%%     append(Q1, [0x22], Q2),
+%%     name(Obf, Q2).
+
+   
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).

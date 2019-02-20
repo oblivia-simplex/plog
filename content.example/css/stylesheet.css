@@ -7,8 +7,19 @@ a {
     text-decoration: none;
     font-weight: bold;
 }
+
 a:hover {
     color: hotpink;
+    text-decoration: none;
+}
+
+a.topnav {
+    color: papayawhip;
+    font-weight: normal;
+}
+
+a.topnav:hover {
+    color: lightpink;
     text-decoration: none;
 }
 
@@ -64,3 +75,4 @@ h3 {
     font-weight: bold;
     color: #8d8e8c
 }
+
