@@ -52,7 +52,7 @@ rss_item(entry(file(Basename),
              '</item>'
          ]) :-
     about(_,_,domain(Domain),_),
-    atomic_list_concat(['http://', Domain, '/posts/', Basename], Link),
+    atomic_list_concat(['http://', Domain, '/content/posts/', Basename], Link),
     Guid = Link,
     atom_concat('./content/posts/', Basename, Filepath),
     commit_date_or_today(Filepath, PubDate).

@@ -1,4 +1,4 @@
-# README #
+# P'log
 
 What I'm trying to do here is set up a minimalistic blogging
 platform, and learn a bit of practically-oriented Prolog in
@@ -25,14 +25,77 @@ Install this with
 ```
 from your `swipl` REPL.
 
-## To Run
+## Getting Started
+
+### Example Files
+In order for anything to actually work, however, you need to first
+provide the blog with some content. The fastest way to get started
+on this is just to
+```
+cp -rv content.example/ content/
+```
+
+### To Run
+
 To serve on port 8000, run:
+
 ```
 $ swipl plog.prolog
 
 :- server(8000). 
 ```
 
-## Example Files
-Before using, the `*.example` files should, at the very least, be copied
-to filenames where the `.example` suffix is dropped.
+## Structure 
+
+Blog posts, including the **About** page, go in `content/posts`, and should be
+in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+format.
+
+For each new post, ensure that there's an entry in `content/toc.data`. Consult
+the example file to get a feel for the expected syntax. P'log is somewhat fussy
+about that sort of thing.
+
+This ToC is used to generate both the listing on the **Home** page, and the RSS
+feed, which your audience can use to subscribe to your blog, and which can be
+accessed at `$YOUR_BLOG_DOMAIN/feed`. 
+
+The CSS files should go in `content/css`. Use the examples given as a template,
+and work from there, until things look the way you'd like. 
+
+The `favicon.ico` can be found in `content/img`, which is where any images linked
+to from your posts should also be stored. The links should be like so:
+
+[look at this fucking mindflayer](/content.example/img/mindflayer.gif)
+
+Metadata for your blog should go in `content/about.prolog`. The syntax used
+there should be fairly self-explanatory. 
+
+If you would like to proxy to the P'log server through Nginx, you can
+add the following lines to your website's entry in `/etc/nginx/sites-available`,
+making whatever adjustments you see fit:
+```
+	location / {
+		try_files $uri @upstream;
+	}
+
+	# proxy through to the p'log server
+    location @upstream {
+
+		# Disables HEAD requests to the site.
+		# SWI-Prolog currently does not support
+		# head requests very well.
+
+		if ($request_method = HEAD) {
+		    return 405;
+		}
+	    
+		proxy_pass http://127.0.0.1:8000;
+        # or whatever port you're using
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header Host $http_host;
+		proxy_set_header X-Nginx-Proxy true;
+		proxy_redirect off;
+	}
+
+```

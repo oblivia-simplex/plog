@@ -37,14 +37,18 @@ server(Port) :-
 http:location(css, '/content/css', []).
 http:location(posts, '/content/posts', []).
 http:location(img, '/content/img', []).
+
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
+user:file_search_path(img, './content/img').
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
 
 :- http_handler(css(.), http_reply_from_files(css, []), [prefix]).
+
 :- http_handler(img(.), http_reply_from_files(img, []), [prefix]).
+
 :- http_handler(posts(.), serve_markdown, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
