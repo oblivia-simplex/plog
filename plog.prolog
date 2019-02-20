@@ -124,6 +124,7 @@ toc_entry_to_html(entry(file(Filename),
     %% Try to parse the date, but fail gracefully if unable to, and
     %% just return the original date atom unaltered.
     (last_build_date_of_file(MdPath, IsoDate),
+     format(user_error, "toc_entry_to_html> IsoDate = ~s~n", IsoDate),
      pretty_date(IsoDate, PrettyDate);
      PrettyDate = uncommitted).
 
