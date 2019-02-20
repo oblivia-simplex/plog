@@ -15,7 +15,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:- use_module(about).
+:- use_module(content/about).
 :- use_module(git).
 :- use_module(rss).
 
@@ -34,10 +34,12 @@ server(Port) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-http:location(static, '/static', []).
-http:location(css, root(css), []).
-http:location(posts, root(posts), []).
-http:location(img, root(img), []).
+http:location(css, '/content/css', []).
+http:location(posts, '/content/posts', []).
+http:location(img, '/content/img', []).
+user:file_search_path(css, './content/css').
+user:file_search_path(posts, './content/posts').
+
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
 
@@ -64,13 +66,15 @@ path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 % Let's try to handle some markdown.
 serve_markdown(Request) :-
     path_of_request(Request, Basename),
-    atom_concat('./posts/', Basename, Path),
+    user:file_search_path(posts, PostDir),
+    atomic_list_concat([PostDir, '/', Basename], Path),
     validate_file(Path),
     md_parse_file(Path, Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
 serve_markdown(Request) :-
-    http_reply_from_files(posts, [], Request).
+    user:file_search_path(posts, PostDir),
+    http_reply_from_files(PostDir, [], Request).
 
 serve_markdown(Request) :-
     http_404([], Request).
@@ -92,7 +96,8 @@ toc_entry_to_html(entry(file(Filename),
                        ['by ', ResolvedAuthor, ' (', PrettyDate, ')']),
                    p(class(toc_abstract), Abstract)]) :-
     resolve_author(Author, ResolvedAuthor),
-    atom_concat('./posts/', Filename, MdPath),
+    user:file_search_path(posts, PostDir),
+    atomic_list_concat([PostDir, '/', Filename], MdPath),
     %% Try to parse the date, but fail gracefully if unable to, and
     %% just return the original date atom unaltered.
     (last_build_date_of_file(MdPath, IsoDate),
@@ -108,7 +113,7 @@ make_toc(Path, Blocks) :-
 
 % the reply_html_page predicate takes care of a lot of this for us.
 display_toc(_Request) :-
-    make_toc('toc.data', ToC),
+    make_toc('content/toc.data', ToC),
     about(title(Title),_,_,_),
     reply_html_page(
         my_style,
@@ -147,7 +152,7 @@ nav_bar -->
 
 
 nav('Home', /).
-nav('About', '/posts/about.md').
+nav('About', '/content/posts/about.md').
 nav('RSS', '/feed').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-

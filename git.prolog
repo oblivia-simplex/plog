@@ -8,7 +8,8 @@ last_build_date_of_file(File, IsoDate) :-
                    [stdout(pipe(Out))]),
     read_line_to_codes(Out, Codes),
     Codes \= end_of_file,
-    atom_codes(IsoDate, Codes).
+    atom_codes(IsoDate, Codes),
+    close(Out).
 
 
 last_build_date_of_repo(Date) :-

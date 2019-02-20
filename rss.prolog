@@ -1,6 +1,6 @@
 :- module(rss, [make_rss/1]).
 
-:- use_module(about).
+:- use_module('content/about').
 :- use_module(git).
 
 
@@ -54,12 +54,12 @@ rss_item(entry(file(Basename),
     about(_,_,domain(Domain),_),
     atomic_list_concat(['http://', Domain, '/posts/', Basename], Link),
     Guid = Link,
-    atom_concat('./posts/', Basename, Filepath),
+    atom_concat('./content/posts/', Basename, Filepath),
     commit_date_or_today(Filepath, PubDate).
 
 make_rss(RSS) :-
     rss_xml_header(Header),
-    open('toc.data', read, Stream),
+    open('content/toc.data', read, Stream),
     read(Stream, ToC),
     maplist(rss_item, ToC, ItemList),
     flatten(ItemList, Items),
