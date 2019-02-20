@@ -47,9 +47,10 @@ $ swipl plog.prolog
 
 ## Structure 
 
-Blog posts, including the **About** page, go in `content/posts`, and should be
+Blog posts go in `content/posts`, and should be
 in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
-format.
+format. Information pages that aren't exactly *posts*, like the GPL 
+license document, or the "about this blog" page, go in `content/info`.
 
 For each new post, ensure that there's an entry in `content/toc.data`. Consult
 the example file to get a feel for the expected syntax. P'log is somewhat fussy

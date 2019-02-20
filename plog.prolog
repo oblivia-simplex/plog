@@ -36,11 +36,15 @@ server(Port) :-
 
 http:location(css, '/content/css', []).
 http:location(posts, '/content/posts', []).
+http:location(info, '/content/info', []).
 http:location(img, '/content/img', []).
+http:location(data, '/content/data', []).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
+user:file_search_path(info, './content/info').
 user:file_search_path(img, './content/img').
+user:file_search_path(data, './content/data').
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
@@ -49,11 +53,21 @@ user:file_search_path(img, './content/img').
 
 :- http_handler(img(.), http_reply_from_files(img, []), [prefix]).
 
-:- http_handler(posts(.), serve_markdown, [prefix]).
+:- http_handler(data(.), http_reply_from_files(data, []), [prefix]).
+
+:- http_handler(posts(.), serve_post_markdown, [prefix]).
+
+:- http_handler(info(.), serve_info_markdown, [prefix]).
+
 :- http_handler(root(.), display_toc, []).
+
 :- http_handler('/favicon.ico',
                 http_reply_file('./content/img/favicon.ico', []),
                 []).
+
+:- http_handler('/robots.txt',
+                http_reply_file('./content/info/robots.txt', []).
+
 :- http_handler('/feed', serve_rss, [prefix]).
 
 serve_rss(_Request) :-
@@ -62,15 +76,19 @@ serve_rss(_Request) :-
 
 
 validate_file(Path) :-
-    exists_file(Path).
+    exists_file(Path),
+    http_safe_file(Path, []).
 
 path_of_request([path_info(PathInfo) | _], PathInfo).
 path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 
+serve_post_markdown(Request) :- serve_markdown(Request, posts).
+serve_info_markdown(Request) :- serve_markdown(Request, info).
+
 % Let's try to handle some markdown.
-serve_markdown(Request) :-
+serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
-    user:file_search_path(posts, PostDir),
+    user:file_search_path(Location, PostDir),
     atomic_list_concat([PostDir, '/', Basename], Path),
     validate_file(Path),
     md_parse_file(Path, Blocks),
@@ -136,6 +154,7 @@ user:body(my_style, Body) -->
                          p(class(abstract), Abstract),
                          \nav_bar,
                          hr(_),
+                         br(_),
                          Body])])])).
 
 user:head(my_style, Head) -->
@@ -156,10 +175,18 @@ nav_bar -->
 
 
 nav('Home', /).
-nav('About', '/content/posts/about.md').
+nav('About', '/content/info/about.md').
+nav('Links', '/content/info/links.md').
+nav('Storage', '/content/data/').
 nav('RSS', '/feed').
+nav('P\'log', 'https://github.com/oblivia-simplex/plog').
+nav('License', '/content/info/gpl.md').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).
 
+
+%%%
+% Logging
+%%%
 

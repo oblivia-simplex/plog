@@ -1,0 +1,33 @@
+body {
+    color: #fdfefc;
+    background-color: #242022;
+}
+a {
+    color: pink;
+    text-decoration: none;
+}
+a:hover {
+    color: hotpink;
+    text-decoration: none;
+}
+
+pre {
+    line-height: 120%
+}
+
+h1 {
+    font-family:monospace;
+}
+
+.dirindex {
+    width: 85vw; margin: 0 auto;
+    overflow: hidden;
+    font-family:monospace;
+    line-height: 175%
+}
+
+#main {
+    float: left;
+    width: 100%;
+    font-size: 130%;
+}

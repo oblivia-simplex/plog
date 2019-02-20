@@ -1,0 +1,66 @@
+body {
+    color: #fdfefc;
+    background-color: #242022;
+}
+a {
+    color: pink;
+    text-decoration: none;
+    font-weight: bold;
+}
+a:hover {
+    color: hotpink;
+    text-decoration: none;
+}
+
+pre {
+    line-height: 120%
+}
+
+.container {
+    width: 85vw;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+h1 {
+    font-family: Garamond;
+    line-height: 120%
+}
+
+h2 {
+    font-family: Garamond;
+}
+
+h3 {
+    font-family: Garamond;
+}
+
+#main {
+    float: none;
+    width: 74%;
+    margin-left: 12%;
+    margin-right: 12%;
+    font-size: 120%;
+    font-family: Courier;
+    line-height: 150%
+}
+
+.toc {
+    height: 90%;
+    overflow-y: auto;
+}
+
+.toc_author {
+    font-size: 75%;
+    line-height: 140%;
+    color: #8d8e8c;
+}
+
+.toc_title {
+    font-weight: bold;
+}
+
+.abstract {
+    font-weight: bold;
+    color: #8d8e8c
+}
