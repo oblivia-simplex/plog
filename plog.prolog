@@ -48,7 +48,7 @@ user:file_search_path(posts, './content/posts').
 :- http_handler(posts(.), serve_markdown, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
-                http_reply_file('favicon.ico', []),
+                http_reply_file('./content/img/favicon.ico', []),
                 []).
 :- http_handler('/feed', serve_rss, [prefix]).
 
