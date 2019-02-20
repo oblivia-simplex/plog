@@ -101,3 +101,12 @@ making whatever adjustments you see fit:
 	}
 
 ```
+
+## Git Layout
+
+It's expected that you will be running P'log from the directory into which
+you have cloned its git repository, and that the data that makes up the
+meat of your blog will live in its own git repo, under `./content/`. P'log
+relies on consulting the `./content/` repo's git log in order to determine
+the publication dates of your posts. (I might think of a better way of doing
+this in the future, but it suits my own purposes pretty nicely, for now.)
