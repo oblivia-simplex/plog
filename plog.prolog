@@ -40,6 +40,7 @@ http:location(posts, '/content/posts', []).
 http:location(info, '/content/info', []).
 http:location(img, '/content/img', []).
 http:location(data, '/content/data', []).
+http:location(tags, '/tags', []).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
@@ -59,6 +60,10 @@ user:file_search_path(data, './content/data').
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 
 :- http_handler(info(.), serve_info_markdown, [prefix]).
+
+:- http_handler(tags(.), display_tags, []).
+
+:- http_handler(tags(_), display_toc, [prefix]).
 
 :- http_handler(root(.), display_toc, []).
 
@@ -103,20 +108,37 @@ serve_markdown(Request, Location) :-
 serve_markdown(Request, _) :-
     http_404([], Request).
 
-resolve_author(me, Me) :- content:about:admin(Me).
-resolve_author(X,X).
 
 % the reply_html_page predicate takes care of a lot of this for us.
-display_toc(_Request) :-
-    make_toc('content/toc.data', ToC),
+display_toc(Request) :-
+    print_term(Request, [output(user_error)]),
+    memberchk(request_uri(Uri), Request),
+    (
+        atom_concat('/tags/', Tag, Uri);
+        Tag = everything
+    ),
+    print_term(Tag, [output(user_error)]),
+    make_toc('content/toc.data', ToC, Tag),
     content:about:title(Title),
     reply_html_page(
         my_style,
         [title(Title)],
         [\toc_page_content(ToC)]).
 
+display_tags(_Request) :-
+    content:about:title(Title),
+    extract_tags_from_toc('content/toc.data', Tags),
+    reply_html_page(
+        my_style,
+        [title(Title)],
+        [\tag_page_content(Tags)]
+    ).
+
 toc_page_content(ToC) -->
     html([ul(class(toc), ToC)]).
+
+tag_page_content(Tags) -->
+    html([ul(class(tag_list), Tags)]).
 
 user:body(my_style, Body) -->
     {
@@ -154,13 +176,22 @@ nav_bar -->
 
 nav('Home', /).
 nav('About', '/content/info/about.md').
+nav('Tags', '/tags').
 nav('Links', '/content/info/links.md').
 nav('Storage', '/content/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/content/info/gpl.md').
-nav('Contact', '/content/info/contact.md').
- 
+%nav('Contact', '/content/info/contact.md').
+
+as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
+    nav(Name, HREF).
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%  some scratch code for testing
+%:- use_module(comments).
+%:- http_handler(root(testform) , test_form_page_handler, [id(testform)]).
 %%
 % Consider replacing this with a javascript obfuscator
 % one that ROT13s the email address, e.g.
@@ -180,13 +211,4 @@ nav('Contact', '/content/info/contact.md').
 %%     append(Q1, [0x22], Q2),
 %%     name(Obf, Q2).
 
-   
-
-as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
-    nav(Name, HREF).
-
-
-%%%%%%%%%%%%%%%%%%%%%%
-%%  some scratch code for testing
-%:- use_module(comments).
-%:- http_handler(root(testform) , test_form_page_handler, [id(testform)]).
+ 
