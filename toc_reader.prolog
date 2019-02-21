@@ -57,7 +57,7 @@ dissect_entry(Entry,
      Abstract = ''),
     (memberchk(date(Date), Entry);
      % if no date provided, check the modification date on the file
-     (post_path(Filename, PostPath),
+     (post_file_path(Filename, PostPath),
       file_mod_date(PostPath, Date));
      % failing that, put the beginning of the epoch, to tip the author off
      Date = '1970-01-01').
@@ -66,19 +66,23 @@ dissect_entry(Entry,
 
 
 
-post_path(Filename, PostPath) :-
+post_uri(Filename, URI) :-
+    http:location(posts, PostDir, []),
+    atomic_list_concat([PostDir, '/', Filename], URI).
+
+post_file_path(Filename, PostPath) :-
     user:file_search_path(posts, PostDir),
     atomic_list_concat([PostDir, '/', Filename], PostPath).
 
 toc_entry_to_html(Entry,
-                  [li(class(toc_title), a(href=MdPath, Title)),
+                  [li(class(toc_title), a(href=HREF, Title)),
                    div(class(toc_author),
                        ['by ', ResolvedAuthor, ' (', PrettyDate, ')']),
                    p(class(toc_abstract), Abstract),
                    p(span(class(toc_tag_line), ['TAGS: ' |TagLine]))]) :-
     dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, IsoDate),
     toc_date(IsoDate, PrettyDate),
-    post_path(Filename, MdPath),
+    post_uri(Filename, HREF),
     resolve_author(Author, ResolvedAuthor),
     maplist(make_tag, Tags, TagLine).
 
