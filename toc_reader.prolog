@@ -54,7 +54,7 @@ compare_entries_by_date(Delta, E1, E2) :-
     dissect_entry(E2,_,_,_,_,Date2),
     parse_time(Date1, T1),
     parse_time(Date2, T2),
-    compare(Delta, T1, T2).
+    compare(Delta, T2, T1).
 
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
