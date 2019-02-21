@@ -1,7 +1,8 @@
 :- module(rss, [make_rss/1]).
 
-% :- use_module('content/about').
+:- use_module('content/about').
 :- use_module(timestamp).
+:- use_module(toc_reader).
 
 escape_char([], []).
 % & --> &amp;
@@ -50,10 +51,7 @@ rss_xml_header([
 rss_xml_footer(['</channel>', '</rss>']).
 
 
-rss_item(entry(file(UnescBasename),
-               title(UnescTitle),
-               author(_),
-               abstract(UnescDesc)),
+rss_item(Entry,
          [
              '<item>',
              '<title>', Title, '</title>',
@@ -63,14 +61,14 @@ rss_item(entry(file(UnescBasename),
              '<pubDate>', PubDate, '</pubDate>',
              '</item>'
          ]) :-
+    dissect_entry(Entry, UnescBasename, UnescTitle, _, UnescDesc, IsoDate),
+    rfc2822_date(IsoDate, PubDate),
     escape_xml_atom(UnescBasename, Basename),
     escape_xml_atom(UnescTitle, Title),
     escape_xml_atom(UnescDesc, Description),
     content:about:domain(Domain),
     atomic_list_concat(['http://', Domain, '/content/posts/', Basename], Link),
-    Guid = Link,
-    atom_concat('./content/posts/', Basename, Filepath),
-    mod_date_or_today(Filepath, PubDate).
+    Guid = Link.
 
 make_rss(RSS) :-
     rss_xml_header(Header),

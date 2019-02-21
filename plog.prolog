@@ -18,6 +18,7 @@
 % :- use_module(content/about).
 :- use_module(timestamp).
 :- use_module(rss).
+:- use_module(toc_reader).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -105,36 +106,6 @@ serve_markdown(Request, _) :-
 resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
 
-pretty_date(IsoDate, PrettyDate) :-
-    parse_time(IsoDate, Timestamp),
-    format_time(atom(PrettyDate), "%F", Timestamp).
-
-% Table of Contents
-toc_entry_to_html(entry(file(Filename),
-                        title(Title),
-                        author(Author),
-                        abstract(Abstract)),
-                  [li(class(toc_title), a(href=MdPath, Title)),
-                   div(class(toc_author),
-                       ['by ', ResolvedAuthor, ' (', PrettyDate, ')']),
-                   p(class(toc_abstract), Abstract)]) :-
-    resolve_author(Author, ResolvedAuthor),
-    user:file_search_path(posts, PostDir),
-    atomic_list_concat([PostDir, '/', Filename], MdPath),
-    %% Try to parse the date, but fail gracefully if unable to, and
-    %% just return the original date atom unaltered.
-    (last_build_date_of_file(MdPath, IsoDate),
-     format(user_error, "toc_entry_to_html> IsoDate = ~s~n", IsoDate),
-     pretty_date(IsoDate, PrettyDate);
-     PrettyDate = uncommitted).
-
-make_toc(Path, Blocks) :-
-    open(Path, read, Stream),
-    read(Stream, Entries),
-    maplist(toc_entry_to_html, Entries, BlockLists),
-    flatten(BlockLists, Blocks).
-
-
 % the reply_html_page predicate takes care of a lot of this for us.
 display_toc(_Request) :-
     make_toc('content/toc.data', ToC),
@@ -215,7 +186,7 @@ as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).
 
 
-%%%
-% Logging
-%%%
-
+%%%%%%%%%%%%%%%%%%%%%%
+%%  some scratch code for testing
+%:- use_module(comments).
+%:- http_handler(root(testform) , test_form_page_handler, [id(testform)]).

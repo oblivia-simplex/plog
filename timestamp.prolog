@@ -3,7 +3,8 @@
                 file_mod_date/2,
                 rfc2822_date/2,
                 mod_date_or_today/2,
-                rfc2822_build_date/1]).
+                rfc2822_build_date/1,
+                toc_date/2]).
 
 
 last_build_date_of_file(File, IsoDate) :-
@@ -46,4 +47,8 @@ mod_date_or_today(File, Date) :-
 rfc2822_build_date(Date) :-
     last_build_date_of_repo(IsoDate),
     rfc2822_date(IsoDate, Date).
+
+toc_date(IsoDate, PrettyDate) :-
+    parse_time(IsoDate, Timestamp),
+    format_time(atom(PrettyDate), "%F", Timestamp).
 
