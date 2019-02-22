@@ -165,7 +165,8 @@ tag_item(TagSpan, li(TagSpan)).
 extract_tags_from_toc(Path, TagBlocks) :-
     open(Path, read, Stream),
     read(Stream, Entries),
-    extract_tags(Entries, Tags),
+    filter_toc_no_drafts(Entries, NoDrafts),
+    extract_tags(NoDrafts, Tags),
     maplist(make_tag, Tags, TagSpans),
     maplist(tag_item, TagSpans, TagBlocks).
 
