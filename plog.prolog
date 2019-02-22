@@ -160,6 +160,8 @@ user:head(my_style, Head) -->
         content:about:title(Title)
     },
     html(head([title(Title),
+               meta([name=viewport,
+                     content='width=device-width, initial-scale=1.0']),
                \html_requires(css('stylesheet.css')),
                Head])).
 

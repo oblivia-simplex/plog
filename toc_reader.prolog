@@ -97,7 +97,11 @@ make_toc(Path, Blocks, Tag) :-
     prepare_toc(Entries, Tag, Blocks).
 
 prepare_toc(Entries, Tag, Blocks) :-
-    filter_toc_by_tag(Entries, Tag, FilteredEntries), 
+    filter_toc_by_tag(Entries, Tag, Filtered1), 
+    (
+        Tag == draft -> FilteredEntries = Filtered1;
+        filter_toc_no_drafts(Filtered1, FilteredEntries)
+    ),
     %FilteredEntries = Entries,
     print_term(FilteredEntries, [output(user_error)]),
     sort_toc(FilteredEntries, SortedEntries),
@@ -109,7 +113,11 @@ compare_entries_by_date(Delta, E1, E2) :-
     dissect_entry(E2,_,_,_,_,_,Date2),
     parse_time(Date1, T1),
     parse_time(Date2, T2),
-    compare(Delta, T2, T1).
+    time_compare(Delta, T2, T1).
+
+time_compare(Delta, T1, T2) :-
+    T1 =:= T2 -> Delta = '<';
+    compare(Delta, T1, T2).
 
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
@@ -126,6 +134,15 @@ filter_toc_by_tag([E|Entries], Tag, [E|FilteredEntries]) :-
 filter_toc_by_tag([_|Entries], Tag, FilteredEntries) :-
     filter_toc_by_tag(Entries, Tag, FilteredEntries).
 
+filter_toc_no_drafts([],[]).
+
+filter_toc_no_drafts([E|Entries], FilteredEntries) :-
+    memberchk(tags(T), E),
+    memberchk(draft, T),
+    filter_toc_no_drafts(Entries, FilteredEntries).
+
+filter_toc_no_drafts([E|Entries], [E|FilteredEntries]) :-
+    filter_toc_no_drafts(Entries, FilteredEntries).
 
 uniq(Data, Uniques) :- sort(Data, Uniques).
 
