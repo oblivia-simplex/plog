@@ -1,7 +1,8 @@
 :- module(toc_reader, [dissect_entry/7,
                        make_toc/3,
                        filter_toc_by_tag/3,
-                       extract_tags_from_toc/2]).
+                       extract_tags_from_toc/2,
+                       filter_toc_no_drafts/2]).
 
 
 :- use_module(timestamp).

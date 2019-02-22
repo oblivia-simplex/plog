@@ -70,10 +70,12 @@ rss_item(Entry,
     atomic_list_concat(['http://', Domain, '/content/posts/', Basename], Link),
     Guid = Link.
 
+% Drafts are excluded from the RSS feed.
 make_rss(RSS) :-
     rss_xml_header(Header),
     open('content/toc.data', read, Stream),
-    read(Stream, ToC),
+    read(Stream, Entries),
+    filter_toc_no_drafts(Entries, ToC),
     maplist(rss_item, ToC, ItemList),
     flatten(ItemList, Items),
     rss_xml_footer(Footer),
