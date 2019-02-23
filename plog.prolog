@@ -111,13 +111,11 @@ serve_markdown(Request, _) :-
 
 % the reply_html_page predicate takes care of a lot of this for us.
 display_toc(Request) :-
-    print_term(Request, [output(user_error)]),
     memberchk(request_uri(Uri), Request),
     (
         atom_concat('/tags/', Tag, Uri);
         Tag = everything
     ),
-    print_term(Tag, [output(user_error)]),
     make_toc('content/toc.data', ToC, Tag),
     content:about:title(Title),
     reply_html_page(
