@@ -1,4 +1,4 @@
-:- module(toc_reader, [dissect_entry/7,
+:- module(toc_reader, [dissect_entry/8,
                        make_toc/3,
                        filter_toc_by_tag/3,
                        extract_tags_from_toc/2,
@@ -43,6 +43,7 @@ dissect_entry(Entry,
               Author,
               Abstract,
               Tags,
+              WordCount,
               Date) :-
     memberchk(file(Filename), Entry),
     memberchk(title(Title), Entry),
@@ -56,16 +57,19 @@ dissect_entry(Entry,
     (memberchk(abstract(Abstract), Entry);
      % if no abstract provided, assume no abstract
      Abstract = ''),
-    (memberchk(date(Date), Entry);
-     % if no date provided, check the modification date on the file
-     (post_file_path(Filename, PostPath),
-      file_mod_date(PostPath, Date));
-     % failing that, put the beginning of the epoch, to tip the author off
-     Date = '1970-01-01').
+    post_file_path(Filename, PostPath),
+    count_words(PostPath, WordCount),
+    date_of_entry(Entry, Date).
 
+date_of_entry(Entry, Date) :-
+    memberchk(date(Date), Entry).
 
+date_of_entry(Entry, Date) :-
+    memberchk(file(Filename), Entry),
+    post_file_path(Filename, Path),
+    file_mod_date(Path, Date).
 
-
+date_of_entry(_Entry, '1970-01-01').
 
 post_uri(Filename, URI) :-
     http:location(posts, PostDir, []),
@@ -76,15 +80,15 @@ post_file_path(Filename, PostPath) :-
     atomic_list_concat([PostDir, '/', Filename], PostPath).
 
 toc_entry_to_html(Entry,
-                  [li(class(toc_title), a(href=HREF, Title)),
-                   div(class(toc_author),
-                       ['by ', ResolvedAuthor, ' (', PrettyDate, ')']),
+                  [li(class(toc_title), [a(href=HREF, Title)]),
+                   div(class(toc_author), Byline),
                    p(class(toc_abstract), Abstract),
                    p(span(class(toc_tag_line), ['TAGS: ' |TagLine]))]) :-
-    dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, IsoDate),
+    dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, WordCount, IsoDate),
     toc_date(IsoDate, PrettyDate),
     post_uri(Filename, HREF),
     resolve_author(Author, ResolvedAuthor),
+    format(atom(Byline), '~d words, by ~s (~s)', [WordCount, ResolvedAuthor, PrettyDate]),
     maplist(make_tag, Tags, TagLine).
 
 make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
@@ -110,8 +114,8 @@ prepare_toc(Entries, Tag, Blocks) :-
     flatten(BlockLists, Blocks).
 
 compare_entries_by_date(Delta, E1, E2) :-
-    dissect_entry(E1,_,_,_,_,_,Date1),
-    dissect_entry(E2,_,_,_,_,_,Date2),
+    dissect_entry(E1,_,_,_,_,_,_,Date1),
+    dissect_entry(E2,_,_,_,_,_,_,Date2),
     parse_time(Date1, T1),
     parse_time(Date2, T2),
     time_compare(Delta, T2, T1).
@@ -170,4 +174,9 @@ extract_tags_from_toc(Path, TagBlocks) :-
     maplist(make_tag, Tags, TagSpans),
     maplist(tag_item, TagSpans, TagBlocks).
 
-
+count_words(Path, Num) :-
+    open(Path, read, Stream),
+    read_string(Stream, _, Text),
+    split_string(Text, " \n\t#", " \n\t#", Words),
+    length(Words, Num),
+    close(Stream).

@@ -61,7 +61,7 @@ rss_item(Entry,
              '<pubDate>', PubDate, '</pubDate>',
              '</item>'
          ]) :-
-    dissect_entry(Entry, UnescBasename, UnescTitle, _Author, UnescDesc, _Tags, IsoDate),
+    dissect_entry(Entry, UnescBasename, UnescTitle, _Author, UnescDesc, _Tags, _WordCount, IsoDate),
     rfc2822_date(IsoDate, PubDate),
     escape_xml_atom(UnescBasename, Basename),
     escape_xml_atom(UnescTitle, Title),
