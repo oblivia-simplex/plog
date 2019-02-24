@@ -2,6 +2,7 @@
                        make_toc/3,
                        filter_toc_by_tag/3,
                        extract_tags_from_toc/2,
+                       get_file_entry/3,
                        filter_toc_no_drafts/2]).
 
 
@@ -107,6 +108,7 @@ make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
 make_toc(Path, Blocks, Tag) :-
     open(Path, read, Stream),
     read(Stream, Entries),
+    close(Stream),
     prepare_toc(Entries, Tag, Blocks).
 
 prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
@@ -116,7 +118,7 @@ prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
         filter_toc_no_drafts(Filtered1, FilteredEntries)
     ),
     %FilteredEntries = Entries,
-    print_term(FilteredEntries, [output(user_error)]),
+    %wrint_term(FilteredEntries, [output(user_error)]),
     sort_toc(FilteredEntries, SortedEntries),
     maplist(toc_entry_to_html, SortedEntries, BlockLists),
     flatten(BlockLists, Blocks).
@@ -183,8 +185,21 @@ extract_tags_from_toc(Path, TagBlocks) :-
     maplist(tag_item, TagSpans, TagBlocks).
 
 count_words(Path, Num) :-
+    nb_current(Path, Num). % check to see if we've already cached the result
+
+count_words(Path, Num) :-
     open(Path, read, Stream),
     read_string(Stream, _, Text),
     split_string(Text, " \n\t#", " \n\t#", Words),
     length(Words, Num),
-    close(Stream).
+    close(Stream),
+    nb_setval(Path, Num).
+
+
+get_file_entry(F, [E|_], E) :-
+    memberchk(file(F), E).
+
+get_file_entry(F, [_|Entries], X) :-
+    get_file_entry(F, Entries, X).
+
+

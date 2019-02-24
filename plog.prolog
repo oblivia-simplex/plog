@@ -92,13 +92,36 @@ path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 serve_post_markdown(Request) :- serve_markdown(Request, posts).
 serve_info_markdown(Request) :- serve_markdown(Request, info).
 
+check_toc_for_file(File, Entry) :-
+    open('./content/toc.data', read, Stream),
+    read(Stream, Entries),
+    close(Stream),
+    get_file_entry(File, Entries, Entry).
+
+draftchk(File) :-
+    check_toc_for_file(File, Entry),
+    memberchk(tags(Tags), Entry),
+    memberchk(draft, Tags).
+
+parse_markdown(File, _, Blocks) :-
+    nb_current(File, Blocks), % check the cache
+    format(user_error, "Retrieved parsed blocks from cache for ~s~n", File).
+
+parse_markdown(File, Location, Blocks) :-
+    user:file_search_path(Location, PostDir),
+    atomic_list_concat([PostDir, '/', File], Path),
+    validate_file(Path),
+    md_parse_file(Path, Blocks),
+    (
+        % Store the result only if the file is not marked as a draft
+        draftchk(File);
+        nb_setval(File, Blocks)
+    ).
+
 % Let's try to handle some markdown.
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
-    user:file_search_path(Location, PostDir),
-    atomic_list_concat([PostDir, '/', Basename], Path),
-    validate_file(Path),
-    md_parse_file(Path, Blocks),
+    parse_markdown(Basename, Location, Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
 serve_markdown(Request, Location) :-
@@ -133,7 +156,7 @@ display_tags(_Request) :-
     ).
 
 toc_page_content(ToC) -->
-    html([ul(class(toc), ToC)]).
+    html([div(class(toc), ul(class(toc), ToC))]).
 
 tag_page_content(Tags) -->
     html([ul(class(tag_list), Tags)]).
