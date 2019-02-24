@@ -109,7 +109,7 @@ make_toc(Path, Blocks, Tag) :-
     read(Stream, Entries),
     prepare_toc(Entries, Tag, Blocks).
 
-prepare_toc(Entries, Tag, Blocks) :-
+prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
     filter_toc_by_tag(Entries, Tag, Filtered1), 
     (
         Tag == draft -> FilteredEntries = Filtered1;
