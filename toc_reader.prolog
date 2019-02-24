@@ -87,7 +87,8 @@ toc_entry_to_html(Entry,
                               div(class(toc_author), Byline),
                               p(class(toc_abstract), Abstract),
                               div(span(class(toc_tag_line), [TagPrefix|TagLine]))
-                          ])
+                          ]),
+                      hr(class=toc_hr)
                   ]) :-
     dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, WordCount, IsoDate),
     toc_date(IsoDate, PrettyDate),
