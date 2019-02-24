@@ -80,15 +80,22 @@ post_file_path(Filename, PostPath) :-
     atomic_list_concat([PostDir, '/', Filename], PostPath).
 
 toc_entry_to_html(Entry,
-                  [li(class(toc_title), [a(href=HREF, Title)]),
-                   div(class(toc_author), Byline),
-                   p(class(toc_abstract), Abstract),
-                   p(span(class(toc_tag_line), ['TAGS: ' |TagLine]))]) :-
+                  [
+                      div(class=toc_entry, [
+                              li(class(toc_title),
+                                 span([a(href=HREF, Title), Date])),
+                              div(class(toc_author), Byline),
+                              p(class(toc_abstract), Abstract),
+                              div(span(class(toc_tag_line), [TagPrefix|TagLine]))
+                          ])
+                  ]) :-
     dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, WordCount, IsoDate),
     toc_date(IsoDate, PrettyDate),
     post_uri(Filename, HREF),
     resolve_author(Author, ResolvedAuthor),
-    format(atom(Byline), '~d words, by ~s (~s)', [WordCount, ResolvedAuthor, PrettyDate]),
+    format(atom(Date), '  (~s)', PrettyDate),
+    format(atom(Byline), 'by ~s (~d words)', [ResolvedAuthor, WordCount]),
+    TagPrefix = 'TAGS: ',
     maplist(make_tag, Tags, TagLine).
 
 make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
