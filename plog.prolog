@@ -35,11 +35,11 @@ server(Port) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-http:location(css, '/content/css', []).
-http:location(posts, '/content/posts', []).
-http:location(info, '/content/info', []).
-http:location(img, '/content/img', []).
-http:location(data, '/content/data', []).
+http:location(css, '/css', []).
+http:location(posts, '/posts', []).
+http:location(info, '/info', []).
+http:location(img, '/img', []).
+http:location(data, '/data', []).
 http:location(tags, '/tags', []).
 
 user:file_search_path(css, './content/css').
@@ -198,13 +198,13 @@ nav_bar -->
 
 
 nav('Home', /).
-nav('About', '/content/info/about.md').
+nav('About', '/info/about.md').
 nav('Tags', '/tags').
-nav('Links', '/content/info/links.md').
-nav('Storage', '/content/data/').
+nav('Links', '/info/links.md').
+nav('Storage', '/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
-nav('License', '/content/info/gpl.md').
+nav('License', '/info/gpl.md').
 %nav('Contact', '/content/info/contact.md').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
