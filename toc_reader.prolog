@@ -138,23 +138,12 @@ time_compare(Delta, T1, T2) :-
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
 
-
-
-supertag(everything, X) :-
-    content:tag_order:includes(_, X);
-    content:tag_order:includes(X, _).
-
-
-supertag(Tag1, Tag2) :-
-    content:tag_order:includes(Tag1, Tag2).
-
-supertag(Tag, Tag).
-
 % transitivity
 supertag(Tag1, Tag2) :-
     content:tag_order:includes(T, Tag2),
     supertag(Tag1, T).
 
+supertag(Tag, Tag).
 
 filter_toc_by_tag([], _, []).
 
