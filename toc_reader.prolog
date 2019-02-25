@@ -5,6 +5,7 @@
                        get_file_entry/3,
                        filter_toc_no_drafts/2]).
 
+:- use_module('content/tag_order').
 
 :- use_module(timestamp).
 
@@ -137,13 +138,32 @@ time_compare(Delta, T1, T2) :-
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
 
+
+
+supertag(everything, X) :-
+    content:tag_order:includes(_, X);
+    content:tag_order:includes(X, _).
+
+
+supertag(Tag1, Tag2) :-
+    content:tag_order:includes(Tag1, Tag2).
+
+supertag(Tag, Tag).
+
+% transitivity
+supertag(Tag1, Tag2) :-
+    content:tag_order:includes(T, Tag2),
+    supertag(Tag1, T).
+
+
 filter_toc_by_tag([], _, []).
 
 filter_toc_by_tag(Entries, everything, Entries).
 
 filter_toc_by_tag([E|Entries], Tag, [E|FilteredEntries]) :-
     memberchk(tags(T), E),
-    memberchk(Tag, T),
+    supertag(Tag, Subtag),
+    memberchk(Subtag, T),
     filter_toc_by_tag(Entries, Tag, FilteredEntries).
 
 filter_toc_by_tag([_|Entries], Tag, FilteredEntries) :-
@@ -203,3 +223,6 @@ get_file_entry(F, [_|Entries], X) :-
     get_file_entry(F, Entries, X).
 
 
+%%%
+% Tag Lattice
+%%
