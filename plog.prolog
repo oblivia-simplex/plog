@@ -51,31 +51,25 @@ user:file_search_path(data, './content/data').
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
 
+%%%
+% Handlers
+%%
 :- http_handler(css(.), http_reply_from_files('./content/css', []), [prefix]).
-
 :- http_handler(img(.), http_reply_from_files('./content/img', []), [prefix]).
-
 :- http_handler(data(.), http_reply_from_files('./content/data', []), [prefix]).
-
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
-
 :- http_handler(info(.), serve_info_markdown, [prefix]).
-
 :- http_handler(tags(.), display_tags, []).
-
 :- http_handler(tags(_), display_toc, [prefix]).
-
 :- http_handler(root(.), display_toc, []).
-
 :- http_handler('/favicon.ico',
                 http_reply_file('./content/img/favicon.ico', []),
                 []).
-
 :- http_handler('/robots.txt',
                 http_reply_file('./content/info/robots.txt', []),
                 []).
-
 :- http_handler('/feed', serve_rss, [prefix]).
+
 
 serve_rss(_Request) :-
     make_rss(RSS),
@@ -103,6 +97,10 @@ draftchk(File) :-
     memberchk(tags(Tags), Entry),
     memberchk(draft, Tags).
 
+draftchk(File) :-
+    check_toc_for_file(File, _);
+    true. % if no entry yet, assume draft
+
 parse_markdown(File, _, Blocks) :-
     nb_current(File, Blocks), % check the cache
     format(user_error, "Retrieved parsed blocks from cache for ~s~n", File).
@@ -118,7 +116,6 @@ parse_markdown(File, Location, Blocks) :-
         nb_setval(File, Blocks)
     ).
 
-% Let's try to handle some markdown.
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
     parse_markdown(Basename, Location, Blocks),
@@ -131,8 +128,6 @@ serve_markdown(Request, Location) :-
 serve_markdown(Request, _) :-
     http_404([], Request).
 
-
-% the reply_html_page predicate takes care of a lot of this for us.
 display_toc(Request) :-
     memberchk(request_uri(Uri), Request),
     (
