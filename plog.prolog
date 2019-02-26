@@ -134,12 +134,23 @@ display_toc(Request) :-
         atom_concat('/tags/', Tag, Uri);
         Tag = everything
     ),
+    %toc_reader:get_subtags(Tag, Subtags),
     make_toc('content/toc.data', ToC, Tag),
     content:about:title(Title),
     reply_html_page(
         my_style,
         [title(Title)],
-        [\toc_page_content(ToC)]).
+        [
+            /*
+            h2('Table of Contents'),
+            p([
+                     'Tag: ~s' - [Tag],
+                     'Subtags: ',
+                     span(Subtags)
+              ]),
+            */
+            \toc_page_content(ToC)
+        ]).
 
 display_tags(_Request) :-
     content:about:title(Title),
@@ -230,3 +241,7 @@ as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
 %%     name(Obf, Q2).
 
  
+
+start :-
+    about:port(Port),
+    server(Port).

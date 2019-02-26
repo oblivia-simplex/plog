@@ -244,6 +244,9 @@ filter_suprema_([T|Tags], TagsInUse, [T|TopTags]) :-
 get_strict_subtags(Tag, Subtags) :-
     findall(T, content:tag_order:super(Tag, T), Subtags).
 
+get_subtags(Tag, Subtags) :-
+    findall(T, supertag(Tag, T), Subtags).
+
 tag_item(Tag, li(span(class=taglist_item,
                       [
                           TagSpan
