@@ -199,9 +199,9 @@ extract_tag_lists([_|Entries], Tags) :-
 extract_tags(Entries, Tags) :-
     extract_tag_lists(Entries, Taglists),
     flatten(Taglists, TagsWithDupes),
-    findall(T, super(T, _), SuperTags),
-    append(TagsWithDupes, SuperTags, TagsWithDupes2),
-    sort(TagsWithDupes2, SortedTags),
+    %findall(T, super(T, _), SuperTags),
+    %append(TagsWithDupes, SuperTags, TagsWithDupes2),
+    sort(TagsWithDupes, SortedTags),
     uniq(SortedTags, Tags).
 
 filter_suprema([],[]).
