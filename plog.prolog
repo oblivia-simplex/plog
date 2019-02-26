@@ -41,12 +41,14 @@ http:location(info, '/info', []).
 http:location(img, '/img', []).
 http:location(data, '/data', []).
 http:location(tags, '/tags', []).
+http:location(static, '/static', []).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
 user:file_search_path(info, './content/info').
 user:file_search_path(img, './content/img').
 user:file_search_path(data, './content/data').
+user:file_search_path(static, './content/static').
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
@@ -57,6 +59,7 @@ user:file_search_path(data, './content/data').
 :- http_handler(css(.), http_reply_from_files('./content/css', []), [prefix]).
 :- http_handler(img(.), http_reply_from_files('./content/img', []), [prefix]).
 :- http_handler(data(.), http_reply_from_files('./content/data', []), [prefix]).
+:- http_handler(static(.), http_reply_from_files('./content/static', []), [prefix]).
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).

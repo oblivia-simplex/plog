@@ -72,6 +72,9 @@ rss_item(Entry,
 
 % Drafts are excluded from the RSS feed.
 make_rss(RSS) :-
+    nb_current(rss, RSS). % cache
+
+make_rss(RSS) :-
     rss_xml_header(Header),
     open('content/toc.data', read, Stream),
     read(Stream, Entries),
@@ -81,5 +84,8 @@ make_rss(RSS) :-
     rss_xml_footer(Footer),
     append(Header, Items, R),
     append(R, Footer, RssList),
-    atomic_list_concat(RssList, RSS).
+    atomic_list_concat(RssList, RSS),
+    nb_setval(rss_feed, RSS).
+
+
 
