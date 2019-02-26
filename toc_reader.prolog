@@ -191,8 +191,8 @@ extract_tags_from_toc(Path, ul(TagBlocks)) :-
     read_toc(Path, Entries),
     filter_toc_no_drafts(Entries, NoDrafts),
     extract_tags(NoDrafts, Tags),
-    filter_suprema(Tags, TopTags),
-    maplist(tag_item, TopTags, TagBlocks).
+    %filter_suprema(Tags, TopTags),
+    maplist(tag_item, Tags, TagBlocks).
 
 extract_tag_lists([], []).
 
