@@ -9,6 +9,7 @@
 
 :- use_module(timestamp).
 
+
 resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
 /*
@@ -164,6 +165,9 @@ filter_toc_by_tag([_|Entries], Tag, FilteredEntries) :-
     filter_toc_by_tag(Entries, Tag, FilteredEntries).
 
 filter_toc_no_drafts([],[]).
+
+filter_toc_no_drafts(X,X) :-
+    nb_current(show_drafts, true).
 
 filter_toc_no_drafts([E|Entries], FilteredEntries) :-
     memberchk(tags(T), E),
