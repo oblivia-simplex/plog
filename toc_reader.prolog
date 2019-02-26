@@ -105,11 +105,19 @@ make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
     atom_concat('/tags/', Tag, HREF),
     upcase_atom(Tag, UppercaseTag).
 
+% Cache the ToC.
+% this means that the server will need to be restarted to refresh it.
+read_toc(_Path, Entries) :-
+    nb_current(toc, Entries).
 
-make_toc(Path, Blocks, Tag) :-
+read_toc(Path, Entries) :-
     open(Path, read, Stream),
     read(Stream, Entries),
     close(Stream),
+    nb_setval(toc, Entries).
+
+make_toc(Path, Blocks, Tag) :-
+    read_toc(Path, Entries),
     prepare_toc(Entries, Tag, Blocks).
 
 prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
@@ -180,8 +188,7 @@ uniq(Data, Uniques) :- sort(Data, Uniques).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 extract_tags_from_toc(Path, ul(TagBlocks)) :-
-    open(Path, read, Stream),
-    read(Stream, Entries),
+    read_toc(Path, Entries),
     filter_toc_no_drafts(Entries, NoDrafts),
     extract_tags(NoDrafts, Tags),
     filter_suprema(Tags, TopTags),
@@ -225,6 +232,8 @@ tag_item(Tag, li(span(class=taglist_item,
     get_strict_subtags(Tag, Subtags),
     sort(Subtags, SortedSubtags),
     maplist(tag_item, SortedSubtags, SubtagItems).
+
+% note: this will include subtags that refer to hidden drafts
 
 
 %%%%%%%%%%%%%%%%%%%
