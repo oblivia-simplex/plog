@@ -9,6 +9,11 @@
 
 :- use_module(timestamp).
 
+show_drafts :-
+    nb_setval(draft_view, true).
+
+hide_drafts :-
+    nb_setval(draft_view, false).
 
 resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
@@ -167,7 +172,7 @@ filter_toc_by_tag([_|Entries], Tag, FilteredEntries) :-
 filter_toc_no_drafts([],[]).
 
 filter_toc_no_drafts(X,X) :-
-    nb_current(show_drafts, true).
+    nb_current(draft_view, true).
 
 filter_toc_no_drafts([E|Entries], FilteredEntries) :-
     memberchk(tags(T), E),
