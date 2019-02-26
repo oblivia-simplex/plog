@@ -203,12 +203,24 @@ extract_tag_lists([E|Entries], [Ts|Tags]) :-
 extract_tag_lists([_|Entries], Tags) :-
     extract_tag_lists(Entries, Tags).
 
+filter_has_at_least_two_subs([], []).
+
+filter_has_at_least_two_subs([T|Tags], [T|Supertags]) :-
+    super(T, X),
+    super(T, Y),
+    X \= Y,
+    filter_has_at_least_two_subs(Tags, Supertags).
+
+filter_has_at_least_two_subs([_|Tags], Supertags) :-
+    filter_has_at_least_two_subs(Tags, Supertags).
+
 extract_tags(Entries, Tags) :-
     extract_tag_lists(Entries, Taglists),
     flatten(Taglists, TagsWithDupes),
-    %findall(T, super(T, _), SuperTags),
-    %append(TagsWithDupes, SuperTags, TagsWithDupes2),
-    sort(TagsWithDupes, SortedTags),
+    findall(T, super(T, _), Supertags),
+    filter_has_at_least_two_subs(Supertags, Supertags2),
+    append(TagsWithDupes, Supertags2, TagsWithDupes2),
+    sort(TagsWithDupes2, SortedTags),
     uniq(SortedTags, Tags).
 
 filter_suprema(Tags, TopTags) :-
