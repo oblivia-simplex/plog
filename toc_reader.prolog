@@ -187,12 +187,17 @@ uniq(Data, Uniques) :- sort(Data, Uniques).
 % Create the Tag Index
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Cache the tag index
+extract_tags_from_toc(_, ul(TagBlocks)) :-
+    nb_current(tag_index, TagBlocks).
+
 extract_tags_from_toc(Path, ul(TagBlocks)) :-
     read_toc(Path, Entries),
     filter_toc_no_drafts(Entries, NoDrafts),
     extract_tags(NoDrafts, Tags),
     filter_suprema(Tags, TopTags),
-    maplist(tag_item, TopTags, TagBlocks).
+    maplist(tag_item, TopTags, TagBlocks),
+    nb_setval(tag_index, TagBlocks).
 
 extract_tag_lists([], []).
 

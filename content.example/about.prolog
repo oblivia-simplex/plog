@@ -13,4 +13,5 @@ admin('Put Your Name Here').
 email('lucca.fraser@gmail.com').
 domain('localhost:8000').
 abstract('Put your abstract in about.prolog.').
+repo('https://github.com/oblivia-simplex/feral_machines').
 
