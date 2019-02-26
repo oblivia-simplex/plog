@@ -191,8 +191,8 @@ extract_tags_from_toc(Path, ul(TagBlocks)) :-
     read_toc(Path, Entries),
     filter_toc_no_drafts(Entries, NoDrafts),
     extract_tags(NoDrafts, Tags),
-    %filter_suprema(Tags, TopTags),
-    maplist(tag_item, Tags, TagBlocks).
+    filter_suprema(Tags, TopTags),
+    maplist(tag_item, TopTags, TagBlocks).
 
 extract_tag_lists([], []).
 
@@ -214,7 +214,8 @@ extract_tags(Entries, Tags) :-
 filter_suprema([],[]).
 
 filter_suprema([T|Tags], TopTags) :-
-    content:tag_order:super(_, T),
+    content:tag_order:super(S, T),
+    memberchk(S, Tags),
     filter_suprema(Tags, TopTags).
 
 filter_suprema([T|Tags], [T|TopTags]) :-
