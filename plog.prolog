@@ -154,7 +154,7 @@ toc_page_content(ToC) -->
     html([div(class(toc), ul(class(toc), ToC))]).
 
 tag_page_content(Tags) -->
-    html([ul(class(tag_list), Tags)]).
+    html([h1('Tags'), div(class(tag_list), Tags)]).
 
 user:body(my_style, Body) -->
     {

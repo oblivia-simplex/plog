@@ -138,11 +138,16 @@ time_compare(Delta, T1, T2) :-
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
 
+%%
+% Tags form a join-semilattice
+%%
+
 % transitivity
 supertag(Tag1, Tag2) :-
-    content:tag_order:includes(T, Tag2),
+    content:tag_order:super(T, Tag2),
     supertag(Tag1, T).
 
+% reflexivity
 supertag(Tag, Tag).
 
 filter_toc_by_tag([], _, []).
@@ -170,7 +175,20 @@ filter_toc_no_drafts([E|Entries], [E|FilteredEntries]) :-
 
 uniq(Data, Uniques) :- sort(Data, Uniques).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create the Tag Index
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+extract_tags_from_toc(Path, ul(TagBlocks)) :-
+    open(Path, read, Stream),
+    read(Stream, Entries),
+    filter_toc_no_drafts(Entries, NoDrafts),
+    extract_tags(NoDrafts, Tags),
+    filter_suprema(Tags, TopTags),
+    maplist(tag_item, TopTags, TagBlocks).
+
 extract_tag_lists([], []).
+
 extract_tag_lists([E|Entries], [Ts|Tags]) :-
     memberchk(tags(Ts), E),
     extract_tag_lists(Entries, Tags).
@@ -181,17 +199,35 @@ extract_tag_lists([_|Entries], Tags) :-
 extract_tags(Entries, Tags) :-
     extract_tag_lists(Entries, Taglists),
     flatten(Taglists, TagsWithDupes),
-    uniq(TagsWithDupes, Tags).
+    findall(T, super(T, _), SuperTags),
+    append(TagsWithDupes, SuperTags, TagsWithDupes2),
+    sort(TagsWithDupes2, SortedTags),
+    uniq(SortedTags, Tags).
 
-tag_item(TagSpan, li(TagSpan)).
+filter_suprema([],[]).
 
-extract_tags_from_toc(Path, TagBlocks) :-
-    open(Path, read, Stream),
-    read(Stream, Entries),
-    filter_toc_no_drafts(Entries, NoDrafts),
-    extract_tags(NoDrafts, Tags),
-    maplist(make_tag, Tags, TagSpans),
-    maplist(tag_item, TagSpans, TagBlocks).
+filter_suprema([T|Tags], TopTags) :-
+    content:tag_order:super(_, T),
+    filter_suprema(Tags, TopTags).
+
+filter_suprema([T|Tags], [T|TopTags]) :-
+    filter_suprema(Tags, TopTags).
+
+get_strict_subtags(Tag, Subtags) :-
+    findall(T, content:tag_order:super(Tag, T), Subtags).
+
+tag_item(Tag, li(span(class=taglist_item,
+                      [
+                          TagSpan
+                          | ul(SubtagItems)
+                      ]))) :-
+    make_tag(Tag, TagSpan),
+    get_strict_subtags(Tag, Subtags),
+    sort(Subtags, SortedSubtags),
+    maplist(tag_item, SortedSubtags, SubtagItems).
+
+
+%%%%%%%%%%%%%%%%%%%
 
 count_words(Path, Num) :-
     nb_current(Path, Num). % check to see if we've already cached the result
