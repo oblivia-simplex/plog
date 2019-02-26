@@ -211,15 +211,18 @@ extract_tags(Entries, Tags) :-
     sort(TagsWithDupes, SortedTags),
     uniq(SortedTags, Tags).
 
-filter_suprema([],[]).
+filter_suprema(Tags, TopTags) :-
+    filter_suprema_(Tags, Tags, TopTags).
 
-filter_suprema([T|Tags], TopTags) :-
+filter_suprema_([],_,[]).
+
+filter_suprema_([T|Tags], TagsInUse, TopTags) :-
     content:tag_order:super(S, T),
-    memberchk(S, Tags),
-    filter_suprema(Tags, TopTags).
+    memberchk(S, TagsInUse),
+    filter_suprema_(Tags, TagsInUse, TopTags).
 
-filter_suprema([T|Tags], [T|TopTags]) :-
-    filter_suprema(Tags, TopTags).
+filter_suprema_([T|Tags], TagsInUse, [T|TopTags]) :-
+    filter_suprema_(Tags, TagsInUse, TopTags).
 
 get_strict_subtags(Tag, Subtags) :-
     findall(T, content:tag_order:super(Tag, T), Subtags).
