@@ -199,7 +199,7 @@ nav('Links', '/info/links.md').
 nav('Storage', '/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
-nav('License', '/info/gpl.md').
+nav('License', '/info/license.md').
 %nav('Contact', '/content/info/contact.md').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
