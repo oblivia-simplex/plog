@@ -106,7 +106,7 @@ draftchk(File) :-
 
 parse_markdown(File, _, Blocks) :-
     nb_current(File, Blocks), % check the cache
-    format(user_error, "Retrieved parsed blocks from cache for ~s~n", File).
+    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', File).
 
 parse_markdown(File, Location, Blocks) :-
     user:file_search_path(Location, PostDir),
@@ -116,7 +116,8 @@ parse_markdown(File, Location, Blocks) :-
     (
         % Store the result only if the file is not marked as a draft
         draftchk(File);
-        nb_setval(File, Blocks)
+        nb_setval(File, Blocks),
+        format(user_error, 'Caching HTML for ~s.~n', File)
     ).
 
 serve_markdown(Request, Location) :-
@@ -243,7 +244,8 @@ as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
 %%     append(Q1, [0x22], Q2),
 %%     name(Obf, Q2).
 
- 
+see_cache(File, Blocks) :-
+    nb_current(File, Blocks).
 
 start :-
     about:port(Port),

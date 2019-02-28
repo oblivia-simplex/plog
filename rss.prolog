@@ -76,9 +76,8 @@ make_rss(RSS) :-
 
 make_rss(RSS) :-
     rss_xml_header(Header),
-    open('content/toc.data', read, Stream),
-    read(Stream, Entries),
-    filter_toc_no_drafts(Entries, ToC),
+    read_toc('content/toc.data', Entries),
+    filter_toc(Entries, ToC),
     maplist(rss_item, ToC, ItemList),
     flatten(ItemList, Items),
     rss_xml_footer(Footer),

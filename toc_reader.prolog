@@ -1,6 +1,9 @@
 :- module(toc_reader, [dissect_entry/8,
+                       read_toc/2,
                        make_toc/3,
                        filter_toc_by_tag/3,
+                       filter_toc/3,
+                       filter_toc/2,
                        extract_tags_from_toc/2,
                        get_file_entry/3,
                        filter_toc_no_drafts/2]).
@@ -120,18 +123,22 @@ make_toc(Path, Blocks, Tag) :-
     read_toc(Path, Entries),
     prepare_toc(Entries, Tag, Blocks).
 
-prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
-    filter_toc_by_tag(Entries, Tag, Filtered1), 
+filter_toc(Entries, Filtered) :-
+    filter_toc(Entries, everything, Filtered).
+
+filter_toc(Entries, Tag, Filtered) :-
     get_time(Now),
+    filter_toc_by_tag(Entries, Tag, F1),
     (
-        Tag == draft -> FilteredEntries = Filtered1;
-        filter_toc_no_drafts(Filtered1, Filtered2),
-        filter_toc_no_future(Filtered2, Now, FilteredEntries)
+        Tag == draft -> F3 = F1;
+        filter_toc_no_drafts(F1, F2),
+        filter_toc_no_future(F2, Now, F3)
     ),
-    %FilteredEntries = Entries,
-    %print_term(FilteredEntries, [output(user_error)]),
-    sort_toc(FilteredEntries, SortedEntries),
-    maplist(toc_entry_to_html, SortedEntries, BlockLists),
+    sort_toc(F3, Filtered).
+
+prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
+    filter_toc(Entries, Tag, FilteredEntries),
+    maplist(toc_entry_to_html, FilteredEntries, BlockLists),
     flatten(BlockLists, Blocks).
 
 compare_entries_by_date(Delta, E1, E2) :-
