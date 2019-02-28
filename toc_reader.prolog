@@ -132,7 +132,10 @@ filter_toc(Entries, Tag, Filtered) :-
     (
         Tag == draft -> F3 = F1;
         filter_toc_no_drafts(F1, F2),
-        filter_toc_no_future(F2, Now, F3)
+        (
+            Tag == the_future -> F3 = F2;
+            filter_toc_no_future(F2, Now, F3)
+        )
     ),
     sort_toc(F3, Filtered).
 
