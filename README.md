@@ -124,29 +124,29 @@ If you would like to proxy to the P'log server through Nginx, you can
 add the following lines to your website's entry in `/etc/nginx/sites-available`,
 making whatever adjustments you see fit:
 ```
-	location / {
-		try_files $uri @upstream;
-	}
+    location / {
+        try_files $uri @upstream;
+    }
 
-	# proxy through to the p'log server
+    # proxy through to the p'log server
     location @upstream {
 
-		# Disables HEAD requests to the site.
-		# SWI-Prolog currently does not support
-		# head requests very well.
+        # Disables HEAD requests to the site.
+        # SWI-Prolog currently does not support
+        # head requests very well.
 
-		if ($request_method = HEAD) {
-		    return 405;
-		}
-	    
-		proxy_pass http://127.0.0.1:8000;
+        if ($request_method = HEAD) {
+            return 405;
+        }
+        
+        proxy_pass http://127.0.0.1:8000;
         # or whatever port you're using
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header Host $http_host;
-		proxy_set_header X-Nginx-Proxy true;
-		proxy_redirect off;
-	}
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Nginx-Proxy true;
+        proxy_redirect off;
+    }
 
 ```
 
