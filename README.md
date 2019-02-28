@@ -28,12 +28,14 @@ from your `swipl` REPL.
 ## Getting Started
 
 ### Example Files
+
 In order for anything to actually work, however, you need to first
 provide the blog with some content. The fastest way to get started
 on this is just to
 ```
 cp -rv content.example/ content/
 ```
+And then make whatever changes you see fit. 
 
 ### To Run
 
@@ -55,6 +57,42 @@ license document, or the "about this blog" page, go in `content/info`.
 For each new post, ensure that there's an entry in `content/toc.data`. Consult
 the example file to get a feel for the expected syntax. P'log is somewhat fussy
 about that sort of thing.
+
+The `date(...)` field is optional. If absent, P'log will check the modification
+timestamp on the file, and use that, instead. Entries whose `date` lies in
+the future won't be displayed in the Table of Contents until that time arrives.
+This provides a simple mechanism for post-dating or queuing blog posts.
+
+The `tags(...)` field is optional as well. If absent, P'log will just assign an
+empty tag list to the entry in question. Tags are taken to form a 
+[partially ordered](http://mathworld.wolfram.com/PartialOrder.html) set,
+whose `<` relation can be specified in the file `content/tag_order.prolog`, 
+using the `super/2` predicate. `super(mammal, horse).`, for example, will
+tell P'log that entries on horses should _also_ be considered to be entries
+on mammals, so that a search for the tag `MAMMAL` will turn up entries tagged
+`HORSE` as well. (Note: tags are capitalized for display, for aesthetic reasons,
+but internally, they are case sensitive Prolog atoms, and should generally be
+left in lowercase, or else surrounded in single quotes, as long as you're 
+consistent.) In the future, I might introduce a way of searching for
+combinations of tags, using standard lattice operations, but I'll cross that
+bridge when I come to it.
+
+The `file(...)` field is mandatory. It should contain the base filename of 
+the entry in question. There's no need to specify the directory, since
+P'log will assume that you stored it in `content/posts`. Maybe in the future
+I'll add support for subdirectories under `content/posts`, to better organize
+the files. Consider this on the TODO list.
+
+The `title(...)` field is mandatory as well. Give your post a title.
+
+The `abstract(...)` field should contain a brief description of the post. It's
+optional, and you can omit it if you don't wish to provide an abstract for
+your post. An empty string will be used instead,
+
+The `author(...)` field is optional. If absent, P'log will retrieve the
+author's name from the `admin(...)` fact in the `about.prolog` file. 
+You can use the atom `me` in place of a name if you want to explicitly
+attribute yourself, the admin, as the author.
 
 This ToC is used to generate both the listing on the **Home** page, and the RSS
 feed, which your audience can use to subscribe to your blog, and which can be
@@ -107,7 +145,7 @@ making whatever adjustments you see fit:
 
 It's expected that you will be running P'log from the directory into which
 you have cloned its git repository, and that the data that makes up the
-meat of your blog will live in its own git repo, under `./content/`. P'log
-relies on consulting the `./content/` repo's git log in order to determine
-the publication dates of your posts. (I might think of a better way of doing
-this in the future, but it suits my own purposes pretty nicely, for now.)
+meat of your blog will live in its own git repo, under `./content/`. This
+isn't strictly necessary, but it's a good way to go about doing things.
+
+
