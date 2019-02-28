@@ -122,12 +122,14 @@ make_toc(Path, Blocks, Tag) :-
 
 prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
     filter_toc_by_tag(Entries, Tag, Filtered1), 
+    get_time(Now),
     (
         Tag == draft -> FilteredEntries = Filtered1;
-        filter_toc_no_drafts(Filtered1, FilteredEntries)
+        filter_toc_no_drafts(Filtered1, Filtered2),
+        filter_toc_no_future(Filtered2, Now, FilteredEntries)
     ),
     %FilteredEntries = Entries,
-    %wrint_term(FilteredEntries, [output(user_error)]),
+    %print_term(FilteredEntries, [output(user_error)]),
     sort_toc(FilteredEntries, SortedEntries),
     maplist(toc_entry_to_html, SortedEntries, BlockLists),
     flatten(BlockLists, Blocks).
@@ -180,6 +182,18 @@ filter_toc_no_drafts([E|Entries], FilteredEntries) :-
 
 filter_toc_no_drafts([E|Entries], [E|FilteredEntries]) :-
     filter_toc_no_drafts(Entries, FilteredEntries).
+
+filter_toc_no_future([],_,[]).
+
+filter_toc_no_future([E|Entries], Now, FilteredEntries) :-
+    % date is > Now
+    memberchk(date(Date), E),
+    parse_time(Date, Timestamp),
+    Timestamp > Now,
+    filter_toc_no_future(Entries, Now, FilteredEntries).
+
+filter_toc_no_future([E|Entries], Now, [E|FilteredEntries]) :-
+    filter_toc_no_future(Entries, Now, FilteredEntries).
 
 uniq(Data, Uniques) :- sort(Data, Uniques).
 
@@ -283,4 +297,13 @@ get_file_entry(F, [_|Entries], X) :-
 
 %%%
 % Tag Lattice
+%%
+
+%%%
+% IDEA: Filter *future-dated* posts from the TOC.
+% This gives us a nice mechanism for queued/post-dated posts.
+%
+% They'd still be accessible if the user knows where to look,
+% via the directory index, but I don't really mind. Let them
+% be rewarded for their curiosity.
 %%
