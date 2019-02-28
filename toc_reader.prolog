@@ -173,6 +173,7 @@ supertag(Tag, Tag).
 filter_toc_by_tag([], _, []).
 
 filter_toc_by_tag(Entries, everything, Entries).
+filter_toc_by_tag(Entries, the_future, Entries).
 
 filter_toc_by_tag([E|Entries], Tag, [E|FilteredEntries]) :-
     memberchk(tags(T), E),
