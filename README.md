@@ -73,7 +73,16 @@ on mammals, so that a search for the tag `MAMMAL` will turn up entries tagged
 `HORSE` as well. (Note: tags are capitalized for display, for aesthetic reasons,
 but internally, they are case sensitive Prolog atoms, and should generally be
 left in lowercase, or else surrounded in single quotes, as long as you're 
-consistent.) In the future, I might introduce a way of searching for
+consistent.) The reflexive, transitive, and antisymmetric relation that
+defines the partially ordered tag set (i.e, the `<=`) will be derived from
+this relation, with the additional assumption that each tag is equal to itself,
+but not to any other tag. **DO NOT** allow there to be any cycles in the
+`super/2` relation. P'log isn't clever enough, or industrious enough, to 
+check for those for you, and will just spin out into an infinite loop as
+it tries to structure your tag hierarchy. Be kind to P'log, and avoid
+cycles.
+
+In the future, I might introduce a way of searching for
 combinations of tags, using standard lattice operations, but I'll cross that
 bridge when I come to it.
 
