@@ -159,7 +159,7 @@ make_header(Basename, Header) :-
                 hr(class=title_hr),
                 div(class=byline, ['by ', Author]),
                 DateDiv,
-                div(class=header_wordcount, WordLine),
+                div(class=header_wordcount, ['Length: ', WordLine]),
                 div(class=tagline, ['Tags: ' | TagLine]),
                 hr(class=title_hr)
             ])
