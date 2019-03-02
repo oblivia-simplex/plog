@@ -177,9 +177,11 @@ serve_markdown(Request, Location) :-
     -> make_header(Basename, Header)
     ; Header = []),
     make_footer(Commit, Footer),
-    append(PostBlocks, Footer, Blocks1),
-    append(Header, Blocks1, Blocks),
-    reply_html_page(my_style, [title(Basename)], Blocks).
+    reply_html_page(my_style,
+                    [title(Basename)],
+                    [div(class=header, Header),
+                     div(class=post, PostBlocks),
+                     div(class=footer, Footer)]).
 
 serve_markdown(Request, Location) :-
     user:file_search_path(Location, PostDir),
