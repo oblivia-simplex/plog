@@ -165,6 +165,8 @@ make_header(Basename, Header) :-
             ])
     ].
 
+make_header(_, []).
+
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
     parse_markdown(Basename, Location, PostBlocks, Commit),
