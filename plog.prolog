@@ -104,25 +104,41 @@ draftchk(File) :-
     check_toc_for_file(File, _);
     true. % if no entry yet, assume draft
 
-parse_markdown(File, _, Blocks) :-
-    nb_current(File, Blocks), % check the cache
-    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', File).
+cache_hash_key(Location, File, Commit, Key) :-
+    git_hash_of_file(Location, File, Commit),
+    atomic_list_concat([Location, '/', File, ':', Commit], Key).
 
-parse_markdown(File, Location, Blocks) :-
+parse_markdown(File, Location, Blocks, Commit) :-
+    cache_hash_key(Location, File, Commit, Key),
+    nb_current(Key, Blocks), % check the cache
+    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', Key).
+
+parse_markdown(File, Location, Blocks, Commit) :-
     user:file_search_path(Location, PostDir),
     atomic_list_concat([PostDir, '/', File], Path),
     validate_file(Path),
+    cache_hash_key(Location, File, Commit, Key),
+    format(user_error, 'Commit for ~s/~s: ~s', [Location, File, Commit]),
     md_parse_file(Path, Blocks),
     (
         % Store the result only if the file is not marked as a draft
         draftchk(File);
-        nb_setval(File, Blocks),
-        format(user_error, 'Caching HTML for ~s.~n', File)
+        nb_setval(Key, Blocks),
+        format(user_error, 'Caching HTML for ~s.~n', Key)
     ).
 
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
-    parse_markdown(Basename, Location, Blocks),
+    parse_markdown(Basename, Location, PostBlocks, Commit),
+    about:repo(Repo),
+    format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
+    append(PostBlocks,
+           [
+               hr(class=footer_hr),
+               div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]),
+               hr(class=footer_hr)
+           ],
+           Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
 serve_markdown(Request, Location) :-
