@@ -18,10 +18,12 @@ content_git_command(GitArgs, Dir, File, Output) :-
         | GitArgs
     ],
     append(Args1, [Path], Args),
-    process_create(path(git), Args, [stdout(pipe(Out))]),
+    process_create(path(git), Args, [stdout(pipe(Out)), process(PID)]),
     working_directory(_, CWD),
     read_line_to_codes(Out, Codes),
     close(Out),
+    process_wait(PID, exit(ExitCode)),
+    ExitCode == 0, % Fail otherwise
     Codes \= end_of_file,
     name(Output, Codes).
 

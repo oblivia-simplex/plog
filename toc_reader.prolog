@@ -71,6 +71,10 @@ date_of_entry(Entry, Date) :-
 
 date_of_entry(Entry, Date) :-
     memberchk(file(Filename), Entry),
+    last_build_date_of_file(posts, Filename, Date).
+
+date_of_entry(Entry, Date) :-
+    memberchk(file(Filename), Entry),
     post_file_path(Filename, Path),
     file_mod_date(Path, Date).
 

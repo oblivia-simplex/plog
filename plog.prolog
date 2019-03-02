@@ -127,6 +127,11 @@ parse_markdown(File, Location, Blocks, Commit) :-
         format(user_error, 'Caching HTML for ~s.~n', Key)
     ).
 
+make_footer(uncommitted,
+            [hr(class=footer_hr),
+             'Last Commit: uncommitted',
+             hr(class=footer_hr)]).
+
 make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     about:repo(Repo),
     Bar = hr(class=footer_hr),
