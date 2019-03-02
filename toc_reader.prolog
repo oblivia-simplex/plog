@@ -1,11 +1,13 @@
 :- module(toc_reader, [dissect_entry/8,
                        read_toc/2,
                        make_toc/3,
+                       make_tag/2,
                        filter_toc_by_tag/3,
                        filter_toc/3,
                        filter_toc/2,
                        extract_tags_from_toc/2,
                        get_file_entry/3,
+                       lookup_file/2,
                        filter_toc_no_drafts/2]).
 
 :- use_module('content/tag_order').
@@ -309,7 +311,9 @@ get_file_entry(F, [E|_], E) :-
 get_file_entry(F, [_|Entries], X) :-
     get_file_entry(F, Entries, X).
 
-
+lookup_file(Basename, Entry) :-
+    read_toc('content/toc.data', Entries),
+    get_file_entry(Basename, Entries, Entry).
 %%%
 % Tag Lattice
 %%

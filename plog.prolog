@@ -138,12 +138,42 @@ make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
     FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]).
 
+make_header(Basename, Header) :-
+    lookup_file(Basename, Entry),
+    dissect_entry(Entry,_,Title,Author,_,Tags,WordCount,Date),
+    toc_date(Date, PrettyDate),
+    format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
+    ((last_build_date_of_file(posts, Basename, RevisedDate),
+      Date \= RevisedDate,
+      toc_date(RevisedDate, PrettyRevisedDate),
+      format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
+      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)]))
+    ; DateDiv = div(class=dateline, DateLine)
+    ),
+    format(atom(WordLine), '~d words', WordCount),
+    maplist(make_tag, Tags, TagLine),
+    Header = [
+        h1(Title),
+        div(class=post_frontmatter,
+            [
+                hr(class=title_hr),
+                div(class=byline, ['by ', Author]),
+                DateDiv,
+                div(class=header_wordcount, WordLine),
+                div(class=tagline, ['Tags: ' | TagLine]),
+                hr(class=title_hr)
+            ])
+    ].
 
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
     parse_markdown(Basename, Location, PostBlocks, Commit),
+    (Location == posts
+    -> make_header(Basename, Header)
+    ; Header = []),
     make_footer(Commit, Footer),
-    append(PostBlocks, Footer, Blocks),
+    append(PostBlocks, Footer, Blocks1),
+    append(Header, Blocks1, Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
 serve_markdown(Request, Location) :-
