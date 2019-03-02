@@ -118,7 +118,7 @@ parse_markdown(File, Location, Blocks, Commit) :-
     atomic_list_concat([PostDir, '/', File], Path),
     validate_file(Path),
     cache_hash_key(Location, File, Commit, Key),
-    format(user_error, 'Commit for ~s/~s: ~s', [Location, File, Commit]),
+    %format(user_error, 'Commit for ~s/~s: ~s', [Location, File, Commit]),
     md_parse_file(Path, Blocks),
     (
         % Store the result only if the file is not marked as a draft
@@ -127,18 +127,18 @@ parse_markdown(File, Location, Blocks, Commit) :-
         format(user_error, 'Caching HTML for ~s.~n', Key)
     ).
 
+make_footer(Commit, [Bar, FooterDiv, Bar]) :-
+    about:repo(Repo),
+    Bar = hr(class=footer_hr),
+    format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
+    FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]).
+
+
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
     parse_markdown(Basename, Location, PostBlocks, Commit),
-    about:repo(Repo),
-    format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
-    append(PostBlocks,
-           [
-               hr(class=footer_hr),
-               div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]),
-               hr(class=footer_hr)
-           ],
-           Blocks),
+    make_footer(Commit, Footer),
+    append(PostBlocks, Footer, Blocks),
     reply_html_page(my_style, [title(Basename)], Blocks).
 
 serve_markdown(Request, Location) :-
