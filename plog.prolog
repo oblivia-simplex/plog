@@ -301,3 +301,8 @@ see_cache(File, Blocks) :-
 start :-
     about:port(Port),
     server(Port).
+
+update :-
+    process_create(path(git), [pull], [process(PID)]),
+    process_wait(PID, _),
+    make.
