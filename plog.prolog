@@ -306,3 +306,5 @@ update :-
     process_create(path(git), [pull], [process(PID)]),
     process_wait(PID, _),
     make.
+
+% just a comment to teest the update
