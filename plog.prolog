@@ -143,6 +143,9 @@ make_header(Basename, Header) :-
     dissect_entry(Entry,_,Title,Author,_,Tags,WordCount,Date),
     toc_date(Date, PrettyDate),
     format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
+    (memberchk(draft, Tags)
+    -> TitleLine = ['DRAFT: ', Title]
+    ; TitleLine = [Title]),
     ((last_build_date_of_file(posts, Basename, RevisedDate),
       Date \= RevisedDate,
       toc_date(RevisedDate, PrettyRevisedDate),
@@ -153,7 +156,7 @@ make_header(Basename, Header) :-
     format(atom(WordLine), '~d words', WordCount),
     maplist(make_tag, Tags, TagLine),
     Header = [
-        h1(Title),
+        h1(TitleLine),
         div(class=post_frontmatter,
             [
                 hr(class=title_hr),
@@ -165,7 +168,7 @@ make_header(Basename, Header) :-
             ])
     ].
 
-make_header(_, []).
+make_header(_, []). % will activate if the file is not in the ToC
 
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
