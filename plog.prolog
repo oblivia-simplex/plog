@@ -179,7 +179,7 @@ serve_markdown(Request, Location) :-
             (memberchk(abstract(Abstract), Entry);
              Abstract = '')
         )
-    ; Header = []),
+    ; Header = [], Abstract = ''),
     format(atom(Description), 'name=description, content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
