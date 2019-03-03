@@ -1,11 +1,18 @@
 :- module(timestamp, [last_build_date_of_file/3,
                       git_hash_of_file/3,
+                      content_git_command/4,
                       last_build_date_of_repo/1,
                       file_mod_date/2,
                       rfc2822_date/2,
                       mod_date_or_today/2,
                       rfc2822_build_date/1,
                       toc_date/2]).
+
+% Add a predicate to adjust the timezone
+% and have the local timezone set in either about.prolog, or consult
+% the OS.
+%
+% Stopgap: 4 hours is 14400 seconds.
 
 content_git_command(GitArgs, Dir, File, Output) :-
     working_directory(CWD, CWD),
@@ -52,6 +59,8 @@ last_build_date_of_repo(Date) :-
 
 rfc2822_date(IsoDate, Rfc2822Date) :-
     parse_time(IsoDate, Timestamp),
+    content:about:timezone(TZ),
+    LocalTimestamp is Timestamp + TZ,
     format_time(atom(Rfc2822Date), '%a, %b %e, %Y', Timestamp).
 
 mod_date_or_today(File, Date) :-
@@ -66,6 +75,9 @@ rfc2822_build_date(Date) :-
 
 toc_date(IsoDate, PrettyDate) :-
     parse_time(IsoDate, Timestamp),
-    format_time(atom(PrettyDate), "%F", Timestamp).
+    % Stopgap
+    content:about:timezone(TZ),
+    LocalTimestamp is Timestamp + TZ,
+    format_time(atom(PrettyDate), "%F", LocalTimestamp).
 
 
