@@ -310,8 +310,19 @@ start :-
     server(Port).
 
 update :-
+    % Update the engine
     process_create(path(git), [pull], [process(PID)]),
     process_wait(PID, _),
+    % Now, update the blog content
+    working_directory(CWD, CWD),
+    atomic_list_concat([CWD, '/', content, '/', '.git'], ContentGitDir),
+    process_create(path(git), [
+                       '--git-dir', ContentGirDir,
+                       '-C', 'content/',
+                       pull
+                   ], [process(PID)]),
+    process_wait(PID, _),
+    toc_reader:reset_toc_globals,
     make.
 
 % just a comment to teest the update

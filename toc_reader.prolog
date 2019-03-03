@@ -314,15 +314,9 @@ get_file_entry(F, [_|Entries], X) :-
 lookup_file(Basename, Entry) :-
     read_toc('content/toc.data', Entries),
     get_file_entry(Basename, Entries, Entry).
-%%%
-% Tag Lattice
+
 %%
 
-%%%
-% IDEA: Filter *future-dated* posts from the TOC.
-% This gives us a nice mechanism for queued/post-dated posts.
-%
-% They'd still be accessible if the user knows where to look,
-% via the directory index, but I don't really mind. Let them
-% be rewarded for their curiosity.
-%%
+reset_toc_globals :-
+    nb_delete(toc),
+    nb_delete(tag_index).
