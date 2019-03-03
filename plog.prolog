@@ -180,7 +180,9 @@ serve_markdown(Request, Location) :-
              memberchk(title(Title), Entry);
              Abstract = '', Title = Basename)
         )
-    ; Header = [], Abstract = ''),
+    ; Header = [],
+      Abstract = '',
+      content:about:title(Title)),
     format(atom(Description), 'name=description, content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
