@@ -16,33 +16,6 @@
 
 resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
-/*
-dissect_entry(entry(file(Filename),
-                    title(Title),
-                    author(Author),
-                    abstract(Abstract),
-                    tags(_Tags)),
-              Filename,
-              Title,
-              Author,
-              Abstract,
-              IsoDate) :-
-    (post_path(Filename, MdPath),
-     file_mod_date(MdPath, IsoDate));
-    IsoDate = 'date unknown'.
-
-dissect_entry(entry(file(Filename),
-                    title(Title),
-                    author(Author),
-                    abstract(Abstract),
-                    tags(_Tags),
-                    date(Date)),
-              Filename,
-              Title,
-              Author,
-              Abstract,
-              Date).
-*/
 
 dissect_entry(Entry,
               Filename,

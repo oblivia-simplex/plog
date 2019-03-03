@@ -138,9 +138,8 @@ make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
     FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]).
 
-make_header(Basename, Header) :-
-    lookup_file(Basename, Entry),
-    dissect_entry(Entry,_,Title,Author,_,Tags,WordCount,Date),
+make_header(Basename, Entry, Header) :-
+    dissect_entry(Entry,_Filename,Title,Author,_Abstract,Tags,WordCount,Date),
     toc_date(Date, PrettyDate),
     format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
     (memberchk(draft, Tags)
@@ -168,17 +167,25 @@ make_header(Basename, Header) :-
             ])
     ].
 
-make_header(_, []). % will activate if the file is not in the ToC
+make_header(_, _, []). % will activate if the file is not in the ToC
 
 serve_markdown(Request, Location) :-
     path_of_request(Request, Basename),
     parse_markdown(Basename, Location, PostBlocks, Commit),
-    (Location == posts
-    -> make_header(Basename, Header)
+    ((Location == posts,
+      lookup_file(Basename, Entry))
+    -> (
+            make_header(Basename, Entry, Header),
+            (memberchk(abstract(Abstract), Entry);
+             Abstract = '')
+        )
     ; Header = []),
+    format(atom(Description), 'name=description, content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
-                    [title(Basename)],
+                    [title(Basename),
+                     meta(Description)
+                    ],
                     [div(class=header, Header),
                      div(class=post, PostBlocks),
                      div(class=footer, Footer)]).
