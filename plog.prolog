@@ -317,7 +317,7 @@ update :-
     working_directory(CWD, CWD),
     atomic_list_concat([CWD, '/', content, '/', '.git'], ContentGitDir),
     process_create(path(git), [
-                       '--git-dir', ContentGirDir,
+                       '--git-dir', ContentGitDir,
                        '-C', 'content/',
                        pull
                    ], [process(PID)]),
