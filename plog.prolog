@@ -176,14 +176,15 @@ serve_markdown(Request, Location) :-
       lookup_file(Basename, Entry))
     -> (
             make_header(Basename, Entry, Header),
-            (memberchk(abstract(Abstract), Entry);
-             Abstract = '')
+            (memberchk(abstract(Abstract), Entry),
+             memberchk(title(Title), Entry);
+             Abstract = '', Title = Basename)
         )
     ; Header = [], Abstract = ''),
     format(atom(Description), 'name=description, content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
-                    [title(Basename),
+                    [title(Title),
                      meta(Description)
                     ],
                     [div(class=header, Header),
