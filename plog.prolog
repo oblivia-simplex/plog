@@ -323,7 +323,7 @@ update :-
                    ], [process(PID2)]),
     process_wait(PID2, _),
     toc_reader:reset_toc_globals,
-    format(user_error, '~n~n'),
+    format(user_error, '~n~n',[]),
     make.
 
 % just a comment to teest the update
