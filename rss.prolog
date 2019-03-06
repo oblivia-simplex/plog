@@ -67,7 +67,7 @@ rss_item(Entry,
     escape_xml_atom(UnescTitle, Title),
     escape_xml_atom(UnescDesc, Description),
     content:about:domain(Domain),
-    atomic_list_concat(['http://', Domain, '/content/posts/', Basename], Link),
+    atomic_list_concat(['http://', Domain, '/posts/', Basename], Link),
     Guid = Link.
 
 % Drafts are excluded from the RSS feed.
