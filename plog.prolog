@@ -10,7 +10,7 @@
 :- use_module(library(http/html_write)).
 % html_resource
 :- use_module(library(http/html_head)). 
-:- use_module(library(md/md_parse)).
+:- use_module(lib/md/md_parse).
 :- use_module(library(lists)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
