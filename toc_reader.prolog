@@ -266,16 +266,16 @@ tag_item(Tag, li(span(class=taglist_item,
 
 %%%%%%%%%%%%%%%%%%%
 
-count_words(Path, Num) :-
-    nb_current(Path, Num). % check to see if we've already cached the result
+%count_words(Path, Num) :-
+%    nb_current(Path, Num). % check to see if we've already cached the result
 
 count_words(Path, Num) :-
     open(Path, read, Stream),
     read_string(Stream, _, Text),
     split_string(Text, " \n\t#", " \n\t#", Words),
     length(Words, Num),
-    close(Stream),
-    nb_setval(Path, Num).
+    close(Stream).
+%    nb_setval(Path, Num).
 
 
 get_file_entry(F, [E|_], E) :-
