@@ -61,7 +61,7 @@ rfc2822_date(IsoDate, Rfc2822Date) :-
     parse_time(IsoDate, Timestamp),
     content:about:timezone(TZ),
     LocalTimestamp is Timestamp + TZ,
-    format_time(atom(Rfc2822Date), '%a, %b %e, %Y', Timestamp).
+    format_time(atom(Rfc2822Date), '%a, %b %e, %Y', LocalTimestamp).
 
 mod_date_or_today(File, Date) :-
     (file_mod_date(File, IsoDate),

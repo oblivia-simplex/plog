@@ -193,9 +193,9 @@ serve_markdown(Request, Location) :-
                      div(class=post, PostBlocks),
                      div(class=footer, Footer)]).
 
-serve_markdown(Request, Location) :-
-    user:file_search_path(Location, PostDir),
-    http_reply_from_files(PostDir, [], Request).
+%serve_markdown(Request, Location) :-
+%    user:file_search_path(Location, PostDir),
+%    http_reply_from_files(PostDir, [], Request).
 
 serve_markdown(Request, _) :-
     http_404([], Request).
