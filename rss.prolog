@@ -103,7 +103,7 @@ sitemap_info(Basename,
              ]) :-
     get_url(info, Basename, Location),
     (
-        last_build_date_of_file(posts, Basename, BuildIsoDate);
+        last_build_date_of_file(info, Basename, BuildIsoDate);
         atom_concat('./content/info/', Basename, Path),
         file_mod_date(Path, BuildIsoDate)
     ),
