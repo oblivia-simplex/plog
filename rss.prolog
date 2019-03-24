@@ -99,6 +99,7 @@ sitemap_info(Basename,
                  '<loc>', Location, '</loc>',
                  '<lastmod>', LastMod, '</lastmod>',
                  '<changefreq>', 'weekly', '</changefreq>',
+                 '<priority>', '0.4', '</priority>',
                  '</url>'
              ]) :-
     get_url(info, Basename, Location),
@@ -114,6 +115,7 @@ sitemap_home([
                     '<loc>', HomeUrl, '</loc>',
                     '<lastmod>', TocLastMod, '</lastmod>',
                     '<changefreq>', 'daily', '</changefreq>',
+                    '<priority>', '0.6', '</priority>',
                     '</url>'
                 ]) :-
     content:about:domain(Domain),
@@ -130,6 +132,7 @@ sitemap_item(Entry,
                  '<loc>', Location, '</loc>',
                  '<lastmod>', LastMod, '</lastmod>',
                  '<changefreq>', 'weekly', '</changefreq>',
+                 '<priority>', '1.0', '</priority>',
                  '</url>'
              ]) :-
     dissect_entry(Entry, UnescBasename, _UnescTitle,
