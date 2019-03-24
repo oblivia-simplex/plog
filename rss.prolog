@@ -110,7 +110,8 @@ sitemap_info(Basename,
     sitemap_date(BuildIsoDate, LastMod).
 
 sitemap_home([
-                    '<url>', HomeUrl, 
+                    '<url>',
+                    '<loc>', HomeUrl, '</loc>',
                     '<lastmod>', TocLastMod, '</lastmod>',
                     '<changefreq>', 'daily', '</changefreq>',
                     '</url>'
