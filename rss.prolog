@@ -100,7 +100,7 @@ sitemap_item(Entry,
     dissect_entry(Entry, UnescBasename, _UnescTitle,
                   _Author, _UnescDesc, _Tags, _WordCount, _IsoDate),
     (
-        last_build_date_of_file('./content/posts/', UnescBasename, BuildIsoDate);
+        last_build_date_of_file(posts, UnescBasename, BuildIsoDate);
         atom_concat('./content/posts/', UnescBasename, Path),
         file_mod_date(Path, BuildIsoDate)
     ),
