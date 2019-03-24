@@ -157,4 +157,8 @@ you have cloned its git repository, and that the data that makes up the
 meat of your blog will live in its own git repo, under `./content/`. This
 isn't strictly necessary, but it's a good way to go about doing things.
 
+# Blogs Powered by P'Log
 
+This list is incomplete. You can help by adding to it. 
+
+1. [Feral Machines](http://feralmachin.es)
