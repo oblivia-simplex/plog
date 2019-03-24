@@ -89,6 +89,26 @@ make_rss(RSS) :-
 % The sitemap for a blog will be pretty similar to its RSS feed, so let's handle
 % that here, too.
 
+get_url(Dir, Basename, Url) :-
+    content:about:domain(Domain),
+    atomic_list_concat(['http://', Domain, '/', Dir, '/', Basename], Url).
+
+sitemap_info(Basename,
+             [
+                 '<url>',
+                 '<loc>', Location, '</loc>',
+                 '<lastmod>', LastMod, '</lastmod>',
+                 '<changefreq>', 'weekly', '</changefreq>',
+                 '</url>'
+             ]) :-
+    get_url(info, Basename, Location),
+    (
+        last_build_date_of_file(posts, Basename, BuildIsoDate);
+        atom_concat('./content/info/', Basename, Path),
+        file_mod_date(Path, BuildIsoDate)
+    ),
+    sitemap_date(BuildIsoDate, LastMod).
+
 sitemap_item(Entry,
              [
                  '<url>',
@@ -105,16 +125,22 @@ sitemap_item(Entry,
         file_mod_date(Path, BuildIsoDate)
     ),
     sitemap_date(BuildIsoDate, LastMod),
-    escape_xml_atom(UnescBasename, Basename),
-    content:about:domain(Domain),
-    atomic_list_concat(['http://', Domain, '/posts/', Basename], Location).
+    get_url(posts, UnescBasename, UnescLocation),
+    escape_xml_atom(UnescLocation, Location).
+
+make_sitemap(Sitemap) :-
+    nb_current(sitemap, Sitemap).
 
 make_sitemap(Sitemap) :-
     sitemap_xml_header(Header),
     read_toc('content/toc.data', Entries),
     filter_toc(Entries, ToC),
     maplist(sitemap_item, ToC, ItemList),
-    flatten(ItemList, Items),
+    sitemap_info('about.md', About),
+    sitemap_info('links.md', Links),
+    sitemap_info('license.md', License),
+    WithInfo = [About, Links, License | ItemList],
+    flatten(WithInfo, Items),
     sitemap_xml_footer(Footer),
     append(Header, Items, S),
     append(S, Footer, SitemapList),
