@@ -74,6 +74,9 @@ user:file_search_path(static, './content/static').
 :- http_handler('/feed', serve_rss, [prefix]).
 :- http_handler('/sitemap', serve_sitemap, [prefix]).
 :- http_handler('/sitemap.xml', serve_sitemap, [prefix]).
+:- http_handler('/BingSiteAuth.xml',
+                http_reply_file('./content/info/BingSiteAuth.xml', []),
+                []).
 
 
 serve_rss(_Request) :-
