@@ -5,6 +5,7 @@
                       file_mod_date/2,
                       rfc2822_date/2,
                       mod_date_or_today/2,
+                      sitemap_date/2,
                       rfc2822_build_date/1,
                       toc_date/2]).
 
@@ -54,6 +55,7 @@ file_mod_date(File, IsoDate) :-
     time_file(File, Timestamp),
     format_time(atom(IsoDate), '%FT%T', Timestamp).
 
+
 last_build_date_of_repo(Date) :-
     file_mod_date('.', Date).
 
@@ -80,4 +82,5 @@ toc_date(IsoDate, PrettyDate) :-
     LocalTimestamp is Timestamp + TZ,
     format_time(atom(PrettyDate), "%F", LocalTimestamp).
 
+sitemap_date(IsoDate, SitemapDate) :- toc_date(IsoDate, SitemapDate).
 

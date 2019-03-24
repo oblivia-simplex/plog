@@ -72,12 +72,16 @@ user:file_search_path(static, './content/static').
                 http_reply_file('./content/info/robots.txt', []),
                 []).
 :- http_handler('/feed', serve_rss, [prefix]).
+:- http_handler('/sitemap', serve_sitemap, [prefix]).
 
 
 serve_rss(_Request) :-
     make_rss(RSS),
     format('Content-Type: application/xml~n~n~s~n', RSS).
 
+serve_sitemap(_Request) :-
+    make_sitemap(Sitemap),
+    format('Content-Type: application/xml~n~n~s~n', Sitemap).
 
 validate_file(Path) :-
     exists_file(Path),

@@ -1,4 +1,4 @@
-:- module(rss, [make_rss/1]).
+:- module(rss, [make_rss/1, make_sitemap/1]).
 
 :- use_module('content/about').
 :- use_module(timestamp).
@@ -86,5 +86,45 @@ make_rss(RSS) :-
     atomic_list_concat(RssList, RSS),
     nb_setval(rss_feed, RSS).
 
+% The sitemap for a blog will be pretty similar to its RSS feed, so let's handle
+% that here, too.
 
+sitemap_item(Entry,
+             [
+                 '<url>',
+                 '<loc>', Location, '</loc>',
+                 '<lastmod>', LastMod, '</lastmod>',
+                 '<changefreq>', 'weekly', '</changefreq>',
+                 '</url>'
+             ]) :-
+    dissect_entry(Entry, UnescBasename, _UnescTitle,
+                  _Author, _UnescDesc, _Tags, _WordCount, _IsoDate),
+    (
+        last_build_date_of_file('./content/posts/', UnescBasename, BuildIsoDate);
+        atom_concat('./content/posts/', UnescBasename, Path),
+        file_mod_date(Path, BuildIsoDate)
+    ),
+    sitemap_date(BuildIsoDate, LastMod),
+    escape_xml_atom(UnescBasename, Basename),
+    content:about:domain(Domain),
+    atomic_list_concat(['http://', Domain, '/posts/', Basename], Location).
 
+make_sitemap(Sitemap) :-
+    sitemap_xml_header(Header),
+    read_toc('content/toc.data', Entries),
+    filter_toc(Entries, ToC),
+    maplist(sitemap_item, ToC, ItemList),
+    flatten(ItemList, Items),
+    sitemap_xml_footer(Footer),
+    append(Header, Items, S),
+    append(S, Footer, SitemapList),
+    atomic_list_concat(SitemapList, Sitemap),
+    nb_setval(sitemap, Sitemap).
+
+sitemap_xml_header(
+    [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    ]).
+
+sitemap_xml_footer(['</urlset>']).
