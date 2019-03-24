@@ -109,6 +109,20 @@ sitemap_info(Basename,
     ),
     sitemap_date(BuildIsoDate, LastMod).
 
+sitemap_home([
+                    '<url>', HomeUrl, 
+                    '<lastmod>', TocLastMod, '</lastmod>',
+                    '<changefreq>', 'daily', '</changefreq>',
+                    '</url>'
+                ]) :-
+    content:about:domain(Domain),
+    atom_concat('http://', Domain, HomeUrl),
+    (
+        last_build_date_of_file('.', 'toc.data', BuildIsoDate);
+        file_mod_date('content/toc.data', BuildIsoDate)
+    ),
+    sitemap_date(BuildIsoDate, TocLastMod).
+
 sitemap_item(Entry,
              [
                  '<url>',
@@ -136,10 +150,11 @@ make_sitemap(Sitemap) :-
     read_toc('content/toc.data', Entries),
     filter_toc(Entries, ToC),
     maplist(sitemap_item, ToC, ItemList),
+    sitemap_home(Home),
     sitemap_info('about.md', About),
     sitemap_info('links.md', Links),
     sitemap_info('license.md', License),
-    WithInfo = [About, Links, License | ItemList],
+    WithInfo = [Home, About, Links, License | ItemList],
     flatten(WithInfo, Items),
     sitemap_xml_footer(Footer),
     append(Header, Items, S),
