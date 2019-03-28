@@ -191,7 +191,7 @@ serve_markdown(Request, Location) :-
     ; Header = [],
       Abstract = '',
       content:about:title(Title)),
-    format(atom(Description), 'name=description, content="~s"', Abstract),
+    format(atom(Description), 'name="description", content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
                     [title(Title),
