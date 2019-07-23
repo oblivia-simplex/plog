@@ -132,7 +132,8 @@ parse_markdown(File, Location, Blocks, Commit) :-
         % Store the result only if the file is not marked as a draft
         draftchk(File);
         nb_setval(Key, Blocks),
-        format(user_error, 'Caching HTML for ~s.~n', Key)
+        format(user_error, 'Caching HTML for ~s.~n', Key),
+        !
     ).
 
 make_footer(uncommitted,

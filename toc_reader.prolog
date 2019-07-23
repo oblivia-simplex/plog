@@ -39,7 +39,8 @@ dissect_entry(Entry,
      Abstract = ''),
     post_file_path(Filename, PostPath),
     count_words(PostPath, WordCount),
-    date_of_entry(Entry, Date).
+    date_of_entry(Entry, Date),
+    !.
 
 date_of_entry(Entry, Date) :-
     memberchk(date(Date), Entry).
@@ -81,26 +82,31 @@ toc_entry_to_html(Entry,
     format(atom(Date), '  (~s)', PrettyDate),
     format(atom(Byline), 'by ~s (~d words)', [ResolvedAuthor, WordCount]),
     TagPrefix = 'TAGS: ',
-    maplist(make_tag, Tags, TagLine).
+    maplist(make_tag, Tags, TagLine),
+    !.
 
 make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
     atom_concat('/tags/', Tag, HREF),
-    upcase_atom(Tag, UppercaseTag).
+    upcase_atom(Tag, UppercaseTag),
+    !.
 
 % Cache the ToC.
 % this means that the server will need to be restarted to refresh it.
 read_toc(_Path, Entries) :-
-    nb_current(toc, Entries).
+    nb_current(toc, Entries),
+    !.
 
 read_toc(Path, Entries) :-
     open(Path, read, Stream),
     read(Stream, Entries),
     close(Stream),
-    nb_setval(toc, Entries).
+    nb_setval(toc, Entries),
+    !.
 
 make_toc(Path, Blocks, Tag) :-
     read_toc(Path, Entries),
-    prepare_toc(Entries, Tag, Blocks).
+    prepare_toc(Entries, Tag, Blocks),
+    !.
 
 filter_toc(Entries, Filtered) :-
     filter_toc(Entries, everything, Filtered).
@@ -274,7 +280,8 @@ count_words(Path, Num) :-
     read_string(Stream, _, Text),
     split_string(Text, " \n\t#", " \n\t#", Words),
     length(Words, Num),
-    close(Stream).
+    close(Stream),
+    !.
 %    nb_setval(Path, Num).
 
 
@@ -286,7 +293,8 @@ get_file_entry(F, [_|Entries], X) :-
 
 lookup_file(Basename, Entry) :-
     read_toc('content/toc.data', Entries),
-    get_file_entry(Basename, Entries, Entry).
+    get_file_entry(Basename, Entries, Entry),
+    !.
 
 %%
 
