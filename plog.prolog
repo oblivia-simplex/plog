@@ -143,7 +143,7 @@ parse_markdown(File, Location, Blocks, Commit) :-
 make_footer(uncommitted,
             [hr(class=footer_hr),
              'Last Commit: uncommitted',
-             hr(class=footer_hr)]),!.
+             hr(class=footer_hr)]).
 
 make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     about:repo(Repo),
