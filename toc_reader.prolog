@@ -43,26 +43,26 @@ dissect_entry(Entry,
     !.
 
 date_of_entry(Entry, Date) :-
-    memberchk(date(Date), Entry).
+    memberchk(date(Date), Entry), !.
 
 date_of_entry(Entry, Date) :-
     memberchk(file(Filename), Entry),
-    last_build_date_of_file(posts, Filename, Date).
+    last_build_date_of_file(posts, Filename, Date), !.
 
 date_of_entry(Entry, Date) :-
     memberchk(file(Filename), Entry),
     post_file_path(Filename, Path),
-    file_mod_date(Path, Date).
+    file_mod_date(Path, Date), !.
 
 date_of_entry(_Entry, '1970-01-01').
 
 post_uri(Filename, URI) :-
     http:location(posts, PostDir, []),
-    atomic_list_concat([PostDir, '/', Filename], URI).
+    atomic_list_concat([PostDir, '/', Filename], URI), !.
 
 post_file_path(Filename, PostPath) :-
     user:file_search_path(posts, PostDir),
-    atomic_list_concat([PostDir, '/', Filename], PostPath).
+    atomic_list_concat([PostDir, '/', Filename], PostPath), !.
 
 toc_entry_to_html(Entry,
                   [
@@ -92,15 +92,15 @@ make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
 
 % Cache the ToC.
 % this means that the server will need to be restarted to refresh it.
-read_toc(_Path, Entries) :-
-    nb_current(toc, Entries),
-    !.
+%read_toc(_Path, Entries) :-
+% nb_current(toc, Entries),
+%    !.
 
 read_toc(Path, Entries) :-
     open(Path, read, Stream),
     read(Stream, Entries),
     close(Stream),
-    nb_setval(toc, Entries),
+%    nb_setval(toc, Entries),
     !.
 
 make_toc(Path, Blocks, Tag) :-
@@ -109,7 +109,7 @@ make_toc(Path, Blocks, Tag) :-
     !.
 
 filter_toc(Entries, Filtered) :-
-    filter_toc(Entries, everything, Filtered).
+    filter_toc(Entries, everything, Filtered), !.
 
 filter_toc(Entries, Tag, Filtered) :-
     get_time(Now),
@@ -122,19 +122,19 @@ filter_toc(Entries, Tag, Filtered) :-
             filter_toc_no_future(F2, Now, F3)
         )
     ),
-    sort_toc(F3, Filtered).
+    sort_toc(F3, Filtered), !.
 
 prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
     filter_toc(Entries, Tag, FilteredEntries),
     maplist(toc_entry_to_html, FilteredEntries, BlockLists),
-    flatten(BlockLists, Blocks).
+    flatten(BlockLists, Blocks), !.
 
 compare_entries_by_date(Delta, E1, E2) :-
     dissect_entry(E1,_,_,_,_,_,_,Date1),
     dissect_entry(E2,_,_,_,_,_,_,Date2),
     parse_time(Date1, T1),
     parse_time(Date2, T2),
-    time_compare(Delta, T2, T1).
+    time_compare(Delta, T2, T1),!.
 
 time_compare(Delta, T1, T2) :-
     T1 =:= T2 -> Delta = '<';

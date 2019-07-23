@@ -101,12 +101,14 @@ check_toc_for_file(File, Entry) :-
     open('./content/toc.data', read, Stream),
     read(Stream, Entries),
     close(Stream),
-    get_file_entry(File, Entries, Entry).
+    get_file_entry(File, Entries, Entry),
+    !.
 
 draftchk(File) :-
     check_toc_for_file(File, Entry),
     memberchk(tags(Tags), Entry),
-    memberchk(draft, Tags).
+    memberchk(draft, Tags),
+    !.
 
 draftchk(File) :-
     check_toc_for_file(File, _);
@@ -114,12 +116,14 @@ draftchk(File) :-
 
 cache_hash_key(Location, File, Commit, Key) :-
     git_hash_of_file(Location, File, Commit),
-    atomic_list_concat([Location, '/', File, ':', Commit], Key).
+    atomic_list_concat([Location, '/', File, ':', Commit], Key),
+    !.
 
-parse_markdown(File, Location, Blocks, Commit) :-
-    cache_hash_key(Location, File, Commit, Key),
-    nb_current(Key, Blocks), % check the cache
-    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', Key).
+%parse_markdown(File, Location, Blocks, Commit) :-
+%    cache_hash_key(Location, File, Commit, Key),
+%    nb_current(Key, Blocks), % check the cache
+%    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', Key),
+%    !.
 
 parse_markdown(File, Location, Blocks, Commit) :-
     user:file_search_path(Location, PostDir),
@@ -139,13 +143,14 @@ parse_markdown(File, Location, Blocks, Commit) :-
 make_footer(uncommitted,
             [hr(class=footer_hr),
              'Last Commit: uncommitted',
-             hr(class=footer_hr)]).
+             hr(class=footer_hr)]),!.
 
 make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     about:repo(Repo),
     Bar = hr(class=footer_hr),
     format(atom(CommitUrl), '~s/commit/~s', [Repo, Commit]),
-    FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]).
+    FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]),
+    !.
 
 make_header(Basename, Entry, Header) :-
     dissect_entry(Entry,_Filename,Title,Author,_Abstract,Tags,WordCount,Date),
@@ -158,8 +163,8 @@ make_header(Basename, Entry, Header) :-
       Date \= RevisedDate,
       toc_date(RevisedDate, PrettyRevisedDate),
       format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
-      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)]))
-    ; DateDiv = div(class=dateline, DateLine)
+      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)])), !
+    ; DateDiv = div(class=dateline, DateLine, !)
     ),
     format(atom(WordLine), '~d words', WordCount),
     maplist(make_tag, Tags, TagLine),
@@ -174,7 +179,8 @@ make_header(Basename, Entry, Header) :-
                 div(class=tagline, ['Tags: ' | TagLine]),
                 hr(class=title_hr)
             ])
-    ].
+    ],
+    !.
 
 make_header(_, _, []). % will activate if the file is not in the ToC
 
