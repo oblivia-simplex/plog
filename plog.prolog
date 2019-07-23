@@ -163,8 +163,8 @@ make_header(Basename, Entry, Header) :-
       Date \= RevisedDate,
       toc_date(RevisedDate, PrettyRevisedDate),
       format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
-      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)])), !
-    ; DateDiv = div(class=dateline, DateLine, !)
+      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)]))
+    ; DateDiv = div(class=dateline, DateLine)
     ),
     format(atom(WordLine), '~d words', WordCount),
     maplist(make_tag, Tags, TagLine),
