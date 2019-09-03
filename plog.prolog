@@ -31,8 +31,9 @@
 % This predicate starts the server in the background, and returns
 % to the toplevel, so that you can reload and debug the code, etc.
 server(Port) :-
-    http_server(http_dispatch, [port(Port)]).
-
+    http_server(http_dispatch, [port(Port)
+                                % ssl([]) % TODO
+                               ]). 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 http:location(css, '/css', []).
@@ -347,4 +348,3 @@ update :-
     format('~n~n'),
     make.
 
-% just a comment to teest the update
