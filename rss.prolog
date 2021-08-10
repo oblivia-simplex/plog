@@ -71,12 +71,13 @@ rss_item(Entry,
     Guid = Link.
 
 % Drafts are excluded from the RSS feed.
-make_rss(RSS) :-
-    nb_current(rss, RSS). % cache
+%% make_rss(RSS) :-
+%%     nb_current(rss, RSS). % cache
 
 make_rss(RSS) :-
     rss_xml_header(Header),
-    read_toc('content/toc.data', Entries),
+    assemble_toc('./content/posts/', Entries),
+    write(user_error, Entries),
     filter_toc(Entries, ToC),
     maplist(rss_item, ToC, ItemList),
     flatten(ItemList, Items),
@@ -151,7 +152,7 @@ make_sitemap(Sitemap) :-
 
 make_sitemap(Sitemap) :-
     sitemap_xml_header(Header),
-    read_toc('content/toc.data', Entries),
+    assemble_toc('./content/posts/', Entries),
     filter_toc(Entries, ToC),
     maplist(sitemap_item, ToC, ItemList),
     sitemap_home(Home),

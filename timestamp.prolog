@@ -7,7 +7,7 @@
                       mod_date_or_today/2,
                       sitemap_date/2,
                       rfc2822_build_date/1,
-                      toc_date/2]).
+                      prettify_date/2]).
 
 % Add a predicate to adjust the timezone
 % and have the local timezone set in either about.prolog, or consult
@@ -36,11 +36,12 @@ content_git_command(GitArgs, Dir, File, Output) :-
     name(Output, Codes).
 
 
-last_build_date_of_file(Dir, File, IsoDate) :-
+last_build_date_of_file(Dir, File, TimeStamp) :-
     content_git_command(['log', '-n1', '--pretty=format:%cI'],
                         Dir,
                         File,
-                        IsoDate).
+                        IsoDate),
+    parse_time(IsoDate, TimeStamp).
 
 git_hash_of_file(Dir, File, Hash) :-
     content_git_command(['log', '-n1', '--pretty=format:%H'],
@@ -51,19 +52,18 @@ git_hash_of_file(Dir, File, Hash) :-
 git_hash_of_file(_,_,uncommitted).
 
 %% cheat, and just take the file modification date
-file_mod_date(File, IsoDate) :-
-    time_file(File, Timestamp),
-    format_time(atom(IsoDate), '%FT%T', Timestamp).
+file_mod_date(File, Timestamp) :-
+    time_file(File, Timestamp).
+    %format_time(atom(IsoDate), '%FT%T', Timestamp).
 
 
 last_build_date_of_repo(Date) :-
     file_mod_date('.', Date).
 
-rfc2822_date(IsoDate, Rfc2822Date) :-
-    parse_time(IsoDate, Timestamp),
+rfc2822_date(TimeStamp, Rfc2822Date) :-
     content:about:timezone(TZ),
-    LocalTimestamp is Timestamp + TZ,
-    format_time(atom(Rfc2822Date), '%a, %b %e, %Y', LocalTimestamp).
+    LocalTimeStamp is TimeStamp + TZ,
+    format_time(atom(Rfc2822Date), '%a, %b %e, %Y', LocalTimeStamp).
 
 mod_date_or_today(File, Date) :-
     (file_mod_date(File, IsoDate),
@@ -75,12 +75,12 @@ rfc2822_build_date(Date) :-
     last_build_date_of_repo(IsoDate),
     rfc2822_date(IsoDate, Date).
 
-toc_date(IsoDate, PrettyDate) :-
-    parse_time(IsoDate, Timestamp),
-    % Stopgap
-    content:about:timezone(TZ),
-    LocalTimestamp is Timestamp + TZ,
-    format_time(atom(PrettyDate), "%F", LocalTimestamp).
 
-sitemap_date(IsoDate, SitemapDate) :- toc_date(IsoDate, SitemapDate).
+
+prettify_date(TimeStamp, PrettyDate) :-
+    %content:about:timezone(TZ),
+    %LocalTimeStamp is TimeStamp + TZ,
+    format_time(atom(PrettyDate), "%F", TimeStamp).
+
+sitemap_date(IsoDate, SitemapDate) :- prettify_date(IsoDate, SitemapDate).
 

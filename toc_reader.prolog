@@ -1,18 +1,24 @@
 :- module(toc_reader, [dissect_entry/8,
-                       read_toc/2,
                        make_toc/3,
                        make_tag/2,
                        filter_toc_by_tag/3,
+                       prepare_toc/3,
                        filter_toc/3,
                        filter_toc/2,
                        extract_tags_from_toc/2,
                        get_file_entry/3,
-                       lookup_file/2,
                        filter_toc_no_drafts/2]).
 
-:- use_module('content/tag_order').
+:- use_module(library(dcg/basics)).
 
+:- use_module('content/tag_order').
+% load the yaml module (from the lib directory)
+:- use_module(lib/yaml/parser).
+:- use_module(lib/yaml/util).
+:- use_module(lib/yaml/serializer).
+%
 :- use_module(timestamp).
+
 
 resolve_author(me, Me) :- content:about:admin(Me).
 resolve_author(X,X).
@@ -75,15 +81,16 @@ toc_entry_to_html(Entry,
                           ]),
                       hr(class=toc_hr)
                   ]) :-
-    dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, WordCount, IsoDate),
-    toc_date(IsoDate, PrettyDate),
+    dissect_entry(Entry, Filename, Title, Author, Abstract, Tags, WordCount, TimeStamp),
+    format_time(atom(IsoDate), "%F", TimeStamp),
+    %prettify_date(IsoDate, PrettyDate),
     post_uri(Filename, HREF),
     resolve_author(Author, ResolvedAuthor),
-    format(atom(Date), '  (~s)', PrettyDate),
+    format(atom(Date), '  (~s)', IsoDate),
     format(atom(Byline), 'by ~s (~d words)', [ResolvedAuthor, WordCount]),
     TagPrefix = 'TAGS: ',
-    maplist(make_tag, Tags, TagLine),
-    !.
+    maplist(make_tag, Tags, TagLine).
+    %!.
 
 make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
     atom_concat('/tags/', Tag, HREF),
@@ -95,16 +102,44 @@ make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
 %read_toc(_Path, Entries) :-
 % nb_current(toc, Entries),
 %    !.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-read_toc(Path, Entries) :-
-    open(Path, read, Stream),
-    read(Stream, Entries),
-    close(Stream),
-%    nb_setval(toc, Entries),
-    !.
 
-make_toc(Path, Blocks, Tag) :-
-    read_toc(Path, Entries),
+
+%% metadata(File, Meta) :-
+%%     util:read_yaml(file(File), YAML),
+%%     parser:parse(YAML, Meta).
+
+%% entry_from_meta(Filename, [file(Filename),
+%%                            title(Meta.title),
+%%                            author(Meta.author),
+%%                            abstract(Meta.abstract),
+%%                            date(Meta.date),
+%%                            tags(Meta.tags)]) :-
+%%     metadata(Filename, Meta).
+
+%% entries_from_meta([], []).
+
+%% entries_from_meta([File|FT], [Entry|ET]) :-
+%%     entry_from_meta(File, Entry),
+%%     entries_from_meta(FT, ET).
+
+
+
+
+% Temporary KLUDGE
+%% read_toc(Path, Entries) :-
+%%     open(Path, read, Stream),
+%%     read(Stream, Entries),
+%%     close(Stream),
+%% %    nb_setval(toc, Entries),
+%%     !.
+
+%% read_toc(_, Entries) :-
+%%     assemble_toc('./content/posts', Entries).
+
+make_toc(PostDir, Blocks, Tag) :-
+    assemble_toc(PostDir, Entries), 
     prepare_toc(Entries, Tag, Blocks),
     !.
 
@@ -129,16 +164,14 @@ prepare_toc(Entries, Tag, [hr(class=toc_hr) | Blocks]) :-
     maplist(toc_entry_to_html, FilteredEntries, BlockLists),
     flatten(BlockLists, Blocks), !.
 
+% Oh, a bit of touchiness is needed here to avoid collapsing
+% entries with identical dates into one another.
 compare_entries_by_date(Delta, E1, E2) :-
-    dissect_entry(E1,_,_,_,_,_,_,Date1),
-    dissect_entry(E2,_,_,_,_,_,_,Date2),
-    parse_time(Date1, T1),
-    parse_time(Date2, T2),
-    time_compare(Delta, T2, T1),!.
+    memberchk(date(Date1), E1),
+    memberchk(date(Date2), E2),
+    (Date1 =:= Date2 -> Delta = '<'
+    ; compare(Delta, Date2, Date1)). % Note reversed order
 
-time_compare(Delta, T1, T2) :-
-    T1 =:= T2 -> Delta = '<';
-    compare(Delta, T1, T2).
 
 sort_toc(Entries, SortedEntries) :-
     predsort(compare_entries_by_date, Entries, SortedEntries).
@@ -201,13 +234,14 @@ uniq(Data, Uniques) :- sort(Data, Uniques).
 extract_tags_from_toc(_, ul(TagBlocks)) :-
     nb_current(tag_index, TagBlocks).
 
-extract_tags_from_toc(Path, ul(TagBlocks)) :-
-    read_toc(Path, Entries),
+extract_tags_from_toc(PostDir, ul(TagBlocks)) :-
+    assemble_toc(PostDir, Entries),
     filter_toc_no_drafts(Entries, NoDrafts),
     extract_tags(NoDrafts, Tags),
     filter_suprema(Tags, TopTags),
     maplist(tag_item, TopTags, TagBlocks),
     nb_setval(tag_index, TagBlocks).
+
 
 extract_tag_lists([], []).
 
@@ -291,10 +325,6 @@ get_file_entry(F, [E|_], E) :-
 get_file_entry(F, [_|Entries], X) :-
     get_file_entry(F, Entries, X).
 
-lookup_file(Basename, Entry) :-
-    read_toc('content/toc.data', Entries),
-    get_file_entry(Basename, Entries, Entry),
-    !.
 
 %%
 

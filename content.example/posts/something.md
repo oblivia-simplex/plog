@@ -1,3 +1,11 @@
+---
+title: Mind Flayers
+author: Janet Jackson
+abstract: They are extremely dangerous.
+date: 1988-2-23
+tags: [mindflayers, danger, watchout]
+---
+
 # Look at this fucking mind flayer
 
 ![mind flayer](/img/mindflayer.gif)

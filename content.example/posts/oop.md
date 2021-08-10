@@ -1,3 +1,11 @@
+---
+title: Ooop!
+author: Janet Jackson
+abstract: Here's another thing.
+date: 1983-12-29
+tags: [news, lorem, fake]
+---
+
 # Est maduere
 
 ## Deam et

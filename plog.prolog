@@ -2,6 +2,7 @@
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_error)).
 :- use_module(library(http/http_log)).
+:- use_module(library(pio)).
 
 % http_reply_from_files is here
 :- use_module(library(http/http_files)).
@@ -10,9 +11,9 @@
 :- use_module(library(http/html_write)).
 % html_resource
 :- use_module(library(http/html_head)). 
-:- use_module(lib/md/md_parse).
 :- use_module(library(lists)).
 
+:- use_module(parse_post).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % :- use_module(content/about).
@@ -98,48 +99,53 @@ path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 serve_post_markdown(Request) :- serve_markdown(Request, posts).
 serve_info_markdown(Request) :- serve_markdown(Request, info).
 
-check_toc_for_file(File, Entry) :-
-    open('./content/toc.data', read, Stream),
-    read(Stream, Entries),
-    close(Stream),
-    get_file_entry(File, Entries, Entry),
-    !.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%parse_metadata_from_file(File, Entry) :- .
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 draftchk(File) :-
-    check_toc_for_file(File, Entry),
-    memberchk(tags(Tags), Entry),
+    parse_meta(File, Entry),
+    memberchk(tag(Tags), Entry),
     memberchk(draft, Tags),
     !.
-
-draftchk(File) :-
-    check_toc_for_file(File, _);
-    true. % if no entry yet, assume draft
 
 cache_hash_key(Location, File, Commit, Key) :-
     git_hash_of_file(Location, File, Commit),
     atomic_list_concat([Location, '/', File, ':', Commit], Key),
     !.
 
-%parse_markdown(File, Location, Blocks, Commit) :-
+%get_content(File, Location, Blocks, Commit) :-
 %    cache_hash_key(Location, File, Commit, Key),
 %    nb_current(Key, Blocks), % check the cache
 %    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', Key),
 %    !.
 
-parse_markdown(File, Location, Blocks, Commit) :-
+% (+File, +Location, -Blocks, -Commit, -Entry)
+get_content(File, Location, Blocks, Commit, Entry) :-
     user:file_search_path(Location, PostDir),
     atomic_list_concat([PostDir, '/', File], Path),
     validate_file(Path),
-    cache_hash_key(Location, File, Commit, Key),
-    %format(user_error, 'Commit for ~s/~s: ~s', [Location, File, Commit]),
-    md_parse_file(Path, Blocks),
-    (
-        % Store the result only if the file is not marked as a draft
-        draftchk(File);
-        nb_setval(Key, Blocks),
-        format(user_error, 'Caching HTML for ~s.~n', Key),
-        !
-    ).
+    git_hash_of_file(Location, File, Commit),
+    %cache_hash_key(Location, File, Commit, Key),
+    %format(user_error, 'Commit for ~s/~s: ~s\n', [Location, File, Commit]),
+    %format(user_error, 'Path: ~s\n', Path),
+    parse_post_with_meta(Path, Blocks, Entry),
+    !.
+
+% (+File, +Location, -Blocks, -Commit)
+get_content(File, Location, Blocks, Commit) :-
+    user:file_search_path(Location, PostDir),
+    atomic_list_concat([PostDir, '/', File], Path),
+    validate_file(Path),
+    git_hash_of_file(Location, File, Commit),
+    format(user_error, 'Commit for ~s/~s: ~s\n', [Location, File, Commit]),
+    format(user_error, 'Path: ~s\n', Path),
+    parse_post(Path, Blocks),
+    !.
+
 
 make_footer(uncommitted,
             [hr(class=footer_hr),
@@ -153,20 +159,42 @@ make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]),
     !.
 
+%% % (+Basename, +Entry, -Header)
+%% make_header(_Basename, Entry, Header) :-
+%%     memberchk(title(Title), Entry),
+%%     memberchk(author(Author), Entry),
+%%     memberchk(tags(Tags), Entry),
+%%     memberchk(date(Date), Entry),
+%%     % TODO: wordcount
+%%     prettify_date(Date, PrettyDate),
+%%     format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
+%%     (memberchk(draft, Tags)
+%%     -> TitleLine = ['DRAFT: ', Title]
+%%     ; TitleLine = [Title]),
+%%     maplist(make_tag, Tags, TagLine),
+%%     Header = [
+%%         h1(TitleLine),
+%%         div(class=post_frontmatter,
+%%             [
+%%                 hr(class=title_hr),
+%%                 div(class=byline, ['Author: ', Author]),
+%%                 div(class=dateline, DateLine),
+%%                 div(class=tagline, ['Tags: ' | TagLine]),
+%%                 hr(class=title_hr)
+%%             ])
+%%     ],
+%%     !.
+
 make_header(Basename, Entry, Header) :-
     dissect_entry(Entry,_Filename,Title,Author,_Abstract,Tags,WordCount,Date),
-    toc_date(Date, PrettyDate),
+    prettify_date(Date, PrettyDate),
     format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
     (memberchk(draft, Tags)
     -> TitleLine = ['DRAFT: ', Title]
     ; TitleLine = [Title]),
-    ((last_build_date_of_file(posts, Basename, RevisedDate),
-      Date \= RevisedDate,
-      toc_date(RevisedDate, PrettyRevisedDate),
-      format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
-      DateDiv = div(class=dateline, [div(DateLine), div(RevisedDateLine)]))
-    ; DateDiv = div(class=dateline, DateLine)
-    ),
+    last_build_date_of_file(posts, Basename, RevisedDate),
+    prettify_date(RevisedDate, PrettyRevisedDate),
+    format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
     format(atom(WordLine), '~d words', WordCount),
     maplist(make_tag, Tags, TagLine),
     Header = [
@@ -175,7 +203,8 @@ make_header(Basename, Entry, Header) :-
             [
                 hr(class=title_hr),
                 div(class=byline, ['Author: ', Author]),
-                DateDiv,
+                div(class=dateline, DateLine),
+                div(class=dateline, RevisedDateLine),
                 div(class=header_wordcount, ['Length: ', WordLine]),
                 div(class=tagline, ['Tags: ' | TagLine]),
                 hr(class=title_hr)
@@ -183,22 +212,14 @@ make_header(Basename, Entry, Header) :-
     ],
     !.
 
-make_header(_, _, []). % will activate if the file is not in the ToC
+%make_header(_, _, []). % will activate if the file is not in the ToC
 
-serve_markdown(Request, Location) :-
+serve_markdown(Request, posts) :-
     path_of_request(Request, Basename),
-    parse_markdown(Basename, Location, PostBlocks, Commit),
-    ((Location == posts,
-      lookup_file(Basename, Entry))
-    -> (
-            make_header(Basename, Entry, Header),
-            (memberchk(abstract(Abstract), Entry),
-             memberchk(title(Title), Entry);
-             Abstract = '', Title = Basename)
-        )
-    ; Header = [],
-      Abstract = '',
-      content:about:title(Title)),
+    get_content(Basename, posts, PostBlocks, Commit, Entry),
+    make_header(Basename, Entry, Header),
+    memberchk(abstract(Abstract), Entry),
+    memberchk(title(Title), Entry),
     format(atom(Description), 'name="description", content="~s"', Abstract),
     make_footer(Commit, Footer),
     reply_html_page(my_style,
@@ -209,9 +230,22 @@ serve_markdown(Request, Location) :-
                      div(class=post, PostBlocks),
                      div(class=footer, Footer)]).
 
-%serve_markdown(Request, Location) :-
-%    user:file_search_path(Location, PostDir),
-%    http_reply_from_files(PostDir, [], Request).
+serve_markdown(Request, Location) :-
+    Location \= posts,
+    path_of_request(Request, Basename),
+    get_content(Basename, Location, PostBlocks, Commit),
+    make_footer(Commit, Footer),
+    format(atom(Title), '~s', [Basename]),
+    format(atom(Description), 'name="description", content="~s"', [Basename]),
+    reply_html_page(my_style,
+                    [title(Title),
+                     meta(Description)],
+                    [div(class=post, PostBlocks),
+                     div(class=footer, Footer)]).
+
+serve_markdown(Request, Location) :-
+    user:file_search_path(Location, PostDir),
+    http_reply_from_files(PostDir, [], Request).
 
 serve_markdown(Request, _) :-
     http_404([], Request).
@@ -223,7 +257,8 @@ display_toc(Request) :-
         Tag = everything
     ),
     %toc_reader:get_subtags(Tag, Subtags),
-    make_toc('content/toc.data', ToC, Tag),
+    user:file_search_path(posts, PostDir),
+    make_toc(PostDir, ToC, Tag),
     content:about:title(Title),
     reply_html_page(
         my_style,
@@ -242,7 +277,8 @@ display_toc(Request) :-
 
 display_tags(_Request) :-
     content:about:title(Title),
-    extract_tags_from_toc('content/toc.data', Tags),
+    user:file_search_path(posts, PostDir),
+    extract_tags_from_toc(PostDir, Tags),
     reply_html_page(
         my_style,
         [title(Title)],
