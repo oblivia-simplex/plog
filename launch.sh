@@ -14,6 +14,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 docker build -t plog ${DIR}
 
 CMD="docker container run -dt \
+  -it \
   -p ${PLOG_PORT}:80 \
   --mount=type=bind,source=${DIR}/content/,target=/www/content/ \
   plog"
