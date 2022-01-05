@@ -1,1 +1,6 @@
-lightmode.css
+@import url("/css/darkmode.css") (prefers-color-scheme: dark) ;
+
+@import url("/css/lightmode.css") (prefers-color-scheme: light) ;
+
+@import url("/css/lightmode.css") (prefers-color-scheme: "no preference") ;
+

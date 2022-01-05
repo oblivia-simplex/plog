@@ -3,8 +3,10 @@
                        parse_post_with_meta/3,
                        assemble_toc/2]).
 
+
 :- use_module(lib/yaml/parser).
 :- use_module(lib/md/md_parse).
+%:- use_module(library(pldoc)).
 % This is a bit of a hack.
 
 % First read the file as lines, then pick out the initial yaml block,
@@ -81,6 +83,7 @@ parse_post(Filename, Html) :-
     (raw_yaml_and_markdown(Filename, _RawYaml, RawMarkdown),
      atom_codes(RawMarkdown, MarkdownCodes),
      md_parse_codes(MarkdownCodes, Html)); % maybe there's no header. fallback
+     %wiki_codes_to_dom(MarkdownCodes, [], Html)); % maybe there's no header. fallback
     format(user_error, 'No header found for ~s, falling back to legacy mode\n', Filename),
     md_parse_file(Filename, Html).
 

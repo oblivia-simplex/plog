@@ -10,7 +10,7 @@
 
 @font-face {
   font-family: "Mono";
-  src: url("/css/fonts/Hermit-Medium.otf");
+  src: url("/css/fonts/lmmonoprop10-regular.otf");
 }
 
 :root {
@@ -82,7 +82,7 @@ h3 {
     width: 74%;
     margin-left: 12%;
     margin-right: 12%;
-    font-size: 120%;
+    font-size: 140%;
     font-family: Mono;
     line-height: 150%;
     font-variant-ligatures: none;
@@ -225,6 +225,16 @@ code {
     font-family: Courier, monospace;
 
 }
+
+
+.dirindex {
+    width: 85vw; margin: 0 auto;
+    overflow: hidden;
+    font-family: Mono;
+    line-height: 175%
+}
+
+
 
 @media only screen and (max-width: 1000px) {
     #main {

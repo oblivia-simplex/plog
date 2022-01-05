@@ -65,7 +65,7 @@ user:file_search_path(static, './content/static').
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
-:- http_handler(tags(_), display_toc, [prefix]).
+%:- http_handler(tags(_), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
                 http_reply_file('./content/img/favicon.ico', []),
@@ -117,21 +117,12 @@ cache_hash_key(Location, File, Commit, Key) :-
     atomic_list_concat([Location, '/', File, ':', Commit], Key),
     !.
 
-%get_content(File, Location, Blocks, Commit) :-
-%    cache_hash_key(Location, File, Commit, Key),
-%    nb_current(Key, Blocks), % check the cache
-%    format(user_error, 'Retrieved parsed blocks from cache for ~s~n', Key),
-%    !.
-
 % (+File, +Location, -Blocks, -Commit, -Entry)
 get_content(File, Location, Blocks, Commit, Entry) :-
     user:file_search_path(Location, PostDir),
     atomic_list_concat([PostDir, '/', File], Path),
     validate_file(Path),
     git_hash_of_file(Location, File, Commit),
-    %cache_hash_key(Location, File, Commit, Key),
-    %format(user_error, 'Commit for ~s/~s: ~s\n', [Location, File, Commit]),
-    %format(user_error, 'Path: ~s\n', Path),
     parse_post_with_meta(Path, Blocks, Entry),
     !.
 
@@ -159,31 +150,6 @@ make_footer(Commit, [Bar, FooterDiv, Bar]) :-
     FooterDiv = div(class=footer, ['Last Commit: ', a(href=CommitUrl, Commit)]),
     !.
 
-%% % (+Basename, +Entry, -Header)
-%% make_header(_Basename, Entry, Header) :-
-%%     memberchk(title(Title), Entry),
-%%     memberchk(author(Author), Entry),
-%%     memberchk(tags(Tags), Entry),
-%%     memberchk(date(Date), Entry),
-%%     % TODO: wordcount
-%%     prettify_date(Date, PrettyDate),
-%%     format(atom(DateLine), 'Posted: ~s', [PrettyDate]),
-%%     (memberchk(draft, Tags)
-%%     -> TitleLine = ['DRAFT: ', Title]
-%%     ; TitleLine = [Title]),
-%%     maplist(make_tag, Tags, TagLine),
-%%     Header = [
-%%         h1(TitleLine),
-%%         div(class=post_frontmatter,
-%%             [
-%%                 hr(class=title_hr),
-%%                 div(class=byline, ['Author: ', Author]),
-%%                 div(class=dateline, DateLine),
-%%                 div(class=tagline, ['Tags: ' | TagLine]),
-%%                 hr(class=title_hr)
-%%             ])
-%%     ],
-%%     !.
 
 make_header(Basename, Entry, Header) :-
     dissect_entry(Entry,_Filename,Title,Author,_Abstract,Tags,WordCount,Date),
@@ -212,10 +178,10 @@ make_header(Basename, Entry, Header) :-
     ],
     !.
 
-%make_header(_, _, []). % will activate if the file is not in the ToC
 
 serve_markdown(Request, posts) :-
     path_of_request(Request, Basename),
+    file_name_extension(_, md, Basename),
     get_content(Basename, posts, PostBlocks, Commit, Entry),
     make_header(Basename, Entry, Header),
     memberchk(abstract(Abstract), Entry),
@@ -232,6 +198,7 @@ serve_markdown(Request, posts) :-
 
 serve_markdown(Request, Location) :-
     Location \= posts,
+    file_name_extension(_, md, Basename),
     path_of_request(Request, Basename),
     get_content(Basename, Location, PostBlocks, Commit),
     make_footer(Commit, Footer),
@@ -264,14 +231,6 @@ display_toc(Request) :-
         my_style,
         [title(Title)],
         [
-            /*
-            h2('Table of Contents'),
-            p([
-                     'Tag: ~s' - [Tag],
-                     'Subtags: ',
-                     span(Subtags)
-              ]),
-            */
             \toc_page_content(ToC)
         ]).
 
@@ -322,7 +281,6 @@ nav_bar -->
  	  html(TopButtons).
 
 
-
 nav('Home', /).
 nav('About', '/info/about.md').
 nav('Tags', '/tags').
@@ -331,37 +289,15 @@ nav('Storage', '/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/info/license.md').
-%nav('Contact', '/content/info/contact.md').
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
     nav(Name, HREF).
 
-
-%%%%%%%%%%%%%%%%%%%%%%
-%%  some scratch code for testing
-%:- use_module(comments).
-%:- http_handler(root(testform) , test_form_page_handler, [id(testform)]).
-%%
-% Consider replacing this with a javascript obfuscator
-% one that ROT13s the email address, e.g.
-%%
-%% gently_obfuscate_codes([],[]).
-%% gently_obfuscate_codes([C|CTail], [Ob|ObTail]) :-
-%%     number_codes(C,Ncodes),
-%%     Ob_ = [0x26,0x23|Ncodes],
-%%     append(Ob_, [0x3b], Ob),
-%%     gently_obfuscate_codes(CTail, ObTail).
-
-%% gently_obfuscate(Clear, Obf) :-
-%%     name(Clear, Codes),
-%%     gently_obfuscate_codes(Codes, ObCodes),
-%%     flatten(ObCodes, FlatObCodes),
-%%     append([0x22], FlatObCodes, Q1),
-%%     append(Q1, [0x22], Q2),
-%%     name(Obf, Q2).
-
 see_cache(File, Blocks) :-
     nb_current(File, Blocks).
+
+
+%%%%% Entry point %%%%%
 
 start :-
     about:port(Port),
