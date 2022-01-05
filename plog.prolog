@@ -198,8 +198,8 @@ serve_markdown(Request, posts) :-
 
 serve_markdown(Request, Location) :-
     Location \= posts,
-    file_name_extension(_, md, Basename),
     path_of_request(Request, Basename),
+    file_name_extension(_, md, Basename),
     get_content(Basename, Location, PostBlocks, Commit),
     make_footer(Commit, Footer),
     format(atom(Title), '~s', [Basename]),
