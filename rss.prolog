@@ -77,7 +77,7 @@ rss_item(Entry,
 make_rss(RSS) :-
     rss_xml_header(Header),
     assemble_toc('./content/posts/', Entries),
-    write(user_error, Entries),
+    %write(user_error, Entries),
     filter_toc(Entries, ToC),
     maplist(rss_item, ToC, ItemList),
     flatten(ItemList, Items),

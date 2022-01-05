@@ -132,8 +132,8 @@ get_content(File, Location, Blocks, Commit) :-
     atomic_list_concat([PostDir, '/', File], Path),
     validate_file(Path),
     git_hash_of_file(Location, File, Commit),
-    format(user_error, 'Commit for ~s/~s: ~s\n', [Location, File, Commit]),
-    format(user_error, 'Path: ~s\n', Path),
+    %format(user_error, 'Commit for ~s/~s: ~s\n', [Location, File, Commit]),
+    %format(user_error, 'Path: ~s\n', Path),
     parse_post(Path, Blocks),
     !.
 
