@@ -1,5 +1,4 @@
 *.log
 .\#*
-content
 log/
 *.swp
