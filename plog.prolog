@@ -245,8 +245,7 @@ get_tag_from_request(Request, draft) :-
 get_tag_from_request(Request, Tag) :-
     memberchk(path(Path), Request),
     atom_concat('/tags/', Tag, Path),
-    Tag \= draft,
-    format(user_error, "[n get_tag_from_request/2] Tag = ~s~n", [Tag]).
+    Tag \= draft.
 
 get_tag_from_request(_, everything).
 
