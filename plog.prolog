@@ -318,7 +318,7 @@ nav_bar -->
  	  html(TopButtons).
 
 
-as_top_nav(Name, span([a([href=HREF, class=topnav], Name), &(nbsp), &(nbsp)])) :-
+as_top_nav(Name, span([a([href=HREF, class=topnav], Name), &(nbsp), ' '])) :-
     nav(Name, HREF).
 
 see_cache(File, Blocks) :-
