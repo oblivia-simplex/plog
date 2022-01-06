@@ -51,13 +51,33 @@ raw_yaml_and_markdown(Filename, Meta, Remainder) :-
     !.
 
 
+meta_author(Meta, Meta.get(author)).
+meta_author(_, 'no author').
+
+meta_title(Meta, Meta.get(title)).
+meta_title(_, 'untitled').
+
+meta_abstract(Meta, Meta.get(abstract)).
+meta_abstract(_, 'no abstract').
+
+meta_date(Meta, Date) :-
+  date_time_stamp(Meta.get(date), Date).
+meta_date(_, 'undated').
+
+meta_tags(Meta, Meta.get(tags)).
+meta_tags(_, [draft]).
+
+
 entry_from_meta(Path, Meta, [file(Basename),
-                           title(Meta.title),
-                           author(Meta.author),
-                           abstract(Meta.abstract),
-                           date(TimeStamp),
+                           title(Title),
+                           author(Author),
+                           abstract(Abstract),
+                           date(Date),
                            tags(Meta.tags)]) :-
-    date_time_stamp(Meta.date, TimeStamp),
+    meta_title(Meta, Title),
+    meta_author(Meta, Author),
+    meta_abstract(Meta, Abstract),
+    meta_date(Meta, Date),
     file_base_name(Path, Basename).
 
 
