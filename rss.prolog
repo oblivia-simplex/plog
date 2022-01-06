@@ -1,6 +1,6 @@
 :- module(rss, [make_rss/1, make_sitemap/1]).
 
-:- use_module('content/about').
+:- use_module('../about').
 :- use_module(timestamp).
 :- use_module(toc_reader).
 
@@ -76,7 +76,7 @@ rss_item(Entry,
 
 make_rss(RSS) :-
     rss_xml_header(Header),
-    assemble_toc('./content/posts/', Entries),
+    assemble_toc('./../posts/', Entries),
     %write(user_error, Entries),
     filter_toc(Entries, ToC),
     maplist(rss_item, ToC, ItemList),
@@ -106,7 +106,7 @@ sitemap_info(Basename,
     get_url(info, Basename, Location),
     (
         last_build_date_of_file(info, Basename, BuildIsoDate);
-        atom_concat('./content/info/', Basename, Path),
+        atom_concat('./../info/', Basename, Path),
         file_mod_date(Path, BuildIsoDate)
     ),
     sitemap_date(BuildIsoDate, LastMod).
@@ -123,7 +123,7 @@ sitemap_home([
     atom_concat('http://', Domain, HomeUrl),
     (
         last_build_date_of_file('.', 'toc.data', BuildIsoDate);
-        file_mod_date('content/toc.data', BuildIsoDate)
+        file_mod_date('../toc.data', BuildIsoDate)
     ),
     sitemap_date(BuildIsoDate, TocLastMod).
 
@@ -140,7 +140,7 @@ sitemap_item(Entry,
                   _Author, _UnescDesc, _Tags, _WordCount, _IsoDate),
     (
         last_build_date_of_file(posts, UnescBasename, BuildIsoDate);
-        atom_concat('./content/posts/', UnescBasename, Path),
+        atom_concat('./../posts/', UnescBasename, Path),
         file_mod_date(Path, BuildIsoDate)
     ),
     sitemap_date(BuildIsoDate, LastMod),
@@ -152,7 +152,7 @@ make_sitemap(Sitemap) :-
 
 make_sitemap(Sitemap) :-
     sitemap_xml_header(Header),
-    assemble_toc('./content/posts/', Entries),
+    assemble_toc('./../posts/', Entries),
     filter_toc(Entries, ToC),
     maplist(sitemap_item, ToC, ItemList),
     sitemap_home(Home),

@@ -18,7 +18,7 @@
 :- use_module(parse_post).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% :- use_module(content/about).
+% :- use_module(../about).
 :- use_module(timestamp).
 :- use_module(rss).
 :- use_module(toc_reader).
@@ -47,12 +47,12 @@ http:location(data, '/data', []).
 http:location(tags, '/tags', []).
 http:location(static, '/static', []).
 
-user:file_search_path(css, './content/css').
-user:file_search_path(posts, './content/posts').
-user:file_search_path(info, './content/info').
-user:file_search_path(img, './content/img').
-user:file_search_path(data, './content/data').
-user:file_search_path(static, './content/static').
+user:file_search_path(css, './../css').
+user:file_search_path(posts, './../posts').
+user:file_search_path(info, './../info').
+user:file_search_path(img, './../img').
+user:file_search_path(data, './../data').
+user:file_search_path(static, './../static').
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
@@ -60,26 +60,26 @@ user:file_search_path(static, './content/static').
 %%%
 % Handlers
 %%
-:- http_handler(css(.), http_reply_from_files('./content/css', []), [prefix]).
-:- http_handler(img(.), http_reply_from_files('./content/img', []), [prefix]).
-:- http_handler(data(.), http_reply_from_files('./content/data', []), [prefix]).
-:- http_handler(static(.), http_reply_from_files('./content/static', []), [prefix]).
+:- http_handler(css(.), http_reply_from_files('./../css', []), [prefix]).
+:- http_handler(img(.), http_reply_from_files('./../img', []), [prefix]).
+:- http_handler(data(.), http_reply_from_files('./../data', []), [prefix]).
+:- http_handler(static(.), http_reply_from_files('./../static', []), [prefix]).
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
 :- http_handler(tags(.), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
-                http_reply_file('./content/img/favicon.ico', []),
+                http_reply_file('./../img/favicon.ico', []),
                 []).
 :- http_handler('/robots.txt',
-                http_reply_file('./content/info/robots.txt', []),
+                http_reply_file('./../info/robots.txt', []),
                 []).
 :- http_handler('/feed', serve_rss, [prefix]).
 :- http_handler('/sitemap', serve_sitemap, [prefix]).
 :- http_handler('/sitemap.xml', serve_sitemap, [prefix]).
 :- http_handler('/BingSiteAuth.xml',
-                http_reply_file('./content/info/BingSiteAuth.xml', []),
+                http_reply_file('./../info/BingSiteAuth.xml', []),
                 []).
 
 
@@ -340,7 +340,7 @@ update :-
     atomic_list_concat([CWD, '/', content, '/', '.git'], ContentGitDir),
     process_create(path(git), [
                        '--git-dir', ContentGitDir,
-                       '-C', 'content/',
+                       '-C', '../',
                        pull
                    ], [process(PID2)]),
     process_wait(PID2, _),
