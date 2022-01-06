@@ -237,9 +237,7 @@ get_secret(opensesame).
 get_tag_from_request(Request, draft) :-
     memberchk(path(Path), Request),
     atom_concat('/tags/', draft, Path),
-    format(user_error, "[in get_tag_from_request/2] Tag = ~s~n", [draft]),
     get_secret(Secret),
-    format(user_error, "[in get_tag_from_request/2] Secret = ~s~n", [Secret]),
     catch(http:http_parameters(Request, [secret(Secret, [] )]),
         error(existence_error(http_parameter, secret), _),
         false). 
