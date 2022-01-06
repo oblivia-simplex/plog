@@ -65,7 +65,7 @@ user:file_search_path(static, './content/static').
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
-%:- http_handler(tags(_), display_toc, [prefix]).
+:- http_handler(tags(.), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
 :- http_handler('/favicon.ico',
                 http_reply_file('./content/img/favicon.ico', []),
