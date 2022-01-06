@@ -301,15 +301,6 @@ user:head(my_style, Head) -->
                Head])).
 
 
-
-nav_bar -->
- 	  {
- 	      findall(Name, nav(Name, _), ButtonNames),
- 	      maplist(as_top_nav, ButtonNames, TopButtons)
- 	  },
- 	  html(TopButtons).
-
-
 nav('Home', /).
 nav('About', '/info/about.md').
 nav('Tags', '/tags').
@@ -319,7 +310,15 @@ nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/info/license.md').
 
-as_top_nav(Name, span([a([href=HREF, class=topnav], Name), ' '])) :-
+nav_bar -->
+ 	  {
+ 	      findall(Name, nav(Name, _), ButtonNames),
+ 	      maplist(as_top_nav, ButtonNames, TopButtons)
+ 	  },
+ 	  html(TopButtons).
+
+
+as_top_nav(Name, span([a([href=HREF, class=topnav], Name), &(nbsp), &(nbsp)])) :-
     nav(Name, HREF).
 
 see_cache(File, Blocks) :-
