@@ -14,12 +14,23 @@
 % the OS.
 %
 % Stopgap: 4 hours is 14400 seconds.
+% This should work even in submodule directories, since there '.git' is
+% not a directory but a file containing a path.
+find_git_dir(ContentDir, GitDir) :-
+    atomic_list_concat([ContentDir, '/', '.git'], D),
+    absolute_file_name(D, AbsDir),
+    ((exists_directory(AbsDir), GitDir = AbsDir, !); 
+      atomic_list_concat([ContentDir, '/', '..'], UpDir),
+      find_git_dir(UpDir, GitDir)).
+
+find_git_dir('/', '/.git') :-
+    exists_directory('/.git').
 
 content_git_command(GitArgs, Dir, File, Output) :-
     working_directory(CWD, CWD),
     atomic_list_concat([Dir, '/', File], Path),
     atomic_list_concat([CWD, '/', content, '/'], ContentDir),
-    atomic_list_concat([ContentDir, '.git'], GitDir),
+    find_git_dir(ContentDir, GitDir),
     Args1 = [
         '--git-dir', GitDir,
         '-C', 'content/'
