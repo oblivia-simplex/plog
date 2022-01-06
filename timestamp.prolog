@@ -22,7 +22,7 @@ content_git_command(GitArgs, Dir, File, Output) :-
     atomic_list_concat([ContentDir, '.git'], GitDir),
     Args1 = [
         '--git-dir', GitDir,
-        '-C', '../'
+        '-C', 'content/'
         | GitArgs
     ],
     append(Args1, [Path], Args),

@@ -11,7 +11,7 @@
 
 :- use_module(library(dcg/basics)).
 
-:- use_module('../tag_order').
+:- use_module('content/tag_order').
 % load the yaml module (from the lib directory)
 :- use_module(lib/yaml/parser).
 :- use_module(lib/yaml/util).
@@ -136,7 +136,7 @@ make_tag(Tag, span([a([href=HREF, class=toc_tag], UppercaseTag), ' '])) :-
 %%     !.
 
 %% read_toc(_, Entries) :-
-%%     assemble_toc('./../posts', Entries).
+%%     assemble_toc('./content/posts', Entries).
 
 make_toc(PostDir, Blocks, Tag) :-
     assemble_toc(PostDir, Entries), 
