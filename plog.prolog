@@ -1,7 +1,9 @@
+:- use_module(library(error)).
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_error)).
 :- use_module(library(http/http_log)).
+:- use_module(library(http/http_parameters)).
 :- use_module(library(pio)).
 
 % http_reply_from_files is here
@@ -217,13 +219,43 @@ serve_markdown(Request, Location) :-
 serve_markdown(Request, _) :-
     http_404([], Request).
 
+
+
+%%
+% The "secret" parameter that's required in order to display the
+% drafts is a pretty low-security secret. It's passed in the GET
+% request, and can easily be snooped. But the stakes are low, so
+% I'm letting it be. Don't put anything in your drafts that you
+% are afraid of the world seeing.
+%%
+get_secret(Secret) :-
+  getenv('PLOG_SECRET', Secret),
+  !.
+
+get_secret(opensesame).
+
+get_tag_from_request(Request, draft) :-
+    memberchk(path(Path), Request),
+    atom_concat('/tags/', draft, Path),
+    format(user_error, "[in get_tag_from_request/2] Tag = ~s~n", [draft]),
+    get_secret(Secret),
+    format(user_error, "[in get_tag_from_request/2] Secret = ~s~n", [Secret]),
+    catch(http:http_parameters(Request, [secret(Secret, [] )]),
+        error(existence_error(http_parameter, secret), _),
+        false). 
+
+get_tag_from_request(Request, Tag) :-
+    memberchk(path(Path), Request),
+    atom_concat('/tags/', Tag, Path),
+    Tag \= draft,
+    format(user_error, "[n get_tag_from_request/2] Tag = ~s~n", [Tag]).
+
+get_tag_from_request(_, everything).
+
+% if the Tag is 'draft', then check for the magic word
+% in the parameter.
 display_toc(Request) :-
-    memberchk(request_uri(Uri), Request),
-    (
-        atom_concat('/tags/', Tag, Uri);
-        Tag = everything
-    ),
-    %toc_reader:get_subtags(Tag, Subtags),
+    get_tag_from_request(Request, Tag),
     user:file_search_path(posts, PostDir),
     make_toc(PostDir, ToC, Tag),
     content:about:title(Title),
