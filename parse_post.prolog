@@ -62,7 +62,7 @@ meta_abstract(_, 'no abstract').
 
 meta_date(Meta, Date) :-
   date_time_stamp(Meta.get(date), Date).
-meta_date(_, 'undated').
+meta_date(_, 0).
 
 meta_tags(Meta, Meta.get(tags)).
 meta_tags(_, [draft]).
@@ -73,11 +73,12 @@ entry_from_meta(Path, Meta, [file(Basename),
                            author(Author),
                            abstract(Abstract),
                            date(Date),
-                           tags(Meta.tags)]) :-
+                           tags(Tags)]) :-
     meta_title(Meta, Title),
     meta_author(Meta, Author),
     meta_abstract(Meta, Abstract),
     meta_date(Meta, Date),
+    meta_tags(Meta, Tags),
     file_base_name(Path, Basename).
 
 

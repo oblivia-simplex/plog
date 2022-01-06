@@ -14,12 +14,14 @@
 % the OS.
 %
 % Stopgap: 4 hours is 14400 seconds.
-% This should work even in submodule directories, since there '.git' is
-% not a directory but a file containing a path.
+
+exists_path(P) :- exists_file(P).
+exists_path(P) :- exists_directory(P).
+
 find_git_dir(ContentDir, GitDir) :-
     atomic_list_concat([ContentDir, '/', '.git'], D),
     absolute_file_name(D, AbsDir),
-    ((exists_directory(AbsDir), GitDir = AbsDir, !); 
+    ((exists_path(AbsDir), GitDir = AbsDir, !); 
       atomic_list_concat([ContentDir, '/', '..'], UpDir),
       find_git_dir(UpDir, GitDir)).
 
@@ -29,8 +31,9 @@ find_git_dir('/', '/.git') :-
 content_git_command(GitArgs, Dir, File, Output) :-
     working_directory(CWD, CWD),
     atomic_list_concat([Dir, '/', File], Path),
-    atomic_list_concat([CWD, '/', content, '/'], ContentDir),
+    atomic_list_concat([CWD, '/content/'], ContentDir),
     find_git_dir(ContentDir, GitDir),
+    %format(user_error, "Git dir is ~s~n", [GitDir]),
     Args1 = [
         '--git-dir', GitDir,
         '-C', 'content/'
@@ -47,12 +50,23 @@ content_git_command(GitArgs, Dir, File, Output) :-
     name(Output, Codes).
 
 
+%% cheat, and just take the file modification date
+file_mod_date(File, Timestamp) :-
+    time_file(File, Timestamp).
+    %format_time(atom(IsoDate), '%FT%T', Timestamp).
+    
 last_build_date_of_file(Dir, File, TimeStamp) :-
     content_git_command(['log', '-n1', '--pretty=format:%cI'],
                         Dir,
                         File,
                         IsoDate),
     parse_time(IsoDate, TimeStamp).
+
+last_build_date_of_file(Dir, File, TimeStamp) :-
+  working_directory(CWD, CWD),
+  atomic_list_concat([CWD, '/content/', Dir, '/', File], Path),
+  file_mod_date(Path, TimeStamp),
+  working_directory(_, CWD).
 
 git_hash_of_file(Dir, File, Hash) :-
     content_git_command(['log', '-n1', '--pretty=format:%H'],
@@ -61,11 +75,6 @@ git_hash_of_file(Dir, File, Hash) :-
                         Hash).
 
 git_hash_of_file(_,_,uncommitted).
-
-%% cheat, and just take the file modification date
-file_mod_date(File, Timestamp) :-
-    time_file(File, Timestamp).
-    %format_time(atom(IsoDate), '%FT%T', Timestamp).
 
 
 last_build_date_of_repo(Date) :-
