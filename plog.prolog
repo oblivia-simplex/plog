@@ -58,10 +58,10 @@ user:file_search_path(static, './content/static').
 %%%
 % Handlers
 %%
-:- http_handler(css(.), http_reply_from_files('./content/css', []), [prefix]).
-:- http_handler(img(.), http_reply_from_files('./content/img', []), [prefix]).
-:- http_handler(data(.), http_reply_from_files('./content/data', []), [prefix]).
-:- http_handler(static(.), http_reply_from_files('./content/static', []), [prefix]).
+:- http_handler(css(.), file_reply('./content/css', []), [prefix]).
+:- http_handler(img(.), file_reply('./content/img', []), [prefix]).
+:- http_handler(data(.), file_reply('./content/data', []), [prefix]).
+:- http_handler(static(.), file_reply('./content/static', []), [prefix]).
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
@@ -80,6 +80,12 @@ user:file_search_path(static, './content/static').
                 http_reply_file('./content/info/BingSiteAuth.xml', []),
                 []).
 
+
+file_reply(Dir, Opt, Request) :-
+    http_reply_from_files(Dir, Opt, Request).
+
+file_reply(_, _, Request) :-
+    http_404([index('/')], Request).
 
 serve_rss(_Request) :-
     make_rss(RSS),
@@ -212,10 +218,7 @@ serve_markdown(Request, Location) :-
 
 serve_markdown(Request, Location) :-
     user:file_search_path(Location, PostDir),
-    http_reply_from_files(PostDir, [], Request).
-
-serve_markdown(Request, _) :-
-    http_404([], Request).
+    file_reply(PostDir, [], Request).
 
 
 
