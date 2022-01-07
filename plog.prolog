@@ -89,7 +89,7 @@ file_reply(Dir, Opt, Request) :-
     http_reply_from_files(Dir, Opt, Request).
 
 file_reply(_, _, Request) :-
-    http_404([index('/')], Request).
+    custom_404(Request).
 
 serve_rss(_Request) :-
     make_rss(RSS),
