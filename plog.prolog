@@ -44,6 +44,7 @@ http:location(img, '/img', []).
 http:location(data, '/data', []).
 http:location(tags, '/tags', []).
 http:location(static, '/static', []).
+http:location(notfound, '/', [priority(0)]).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
@@ -67,6 +68,7 @@ user:file_search_path(static, './content/static').
 :- http_handler(tags(.), display_tags, []).
 :- http_handler(tags(.), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
+:- http_handler(notfound(.), custom_404, [prefix]).
 :- http_handler('/favicon.ico',
                 http_reply_file('./content/img/favicon.ico', []),
                 []).
@@ -79,6 +81,8 @@ user:file_search_path(static, './content/static').
 :- http_handler('/BingSiteAuth.xml',
                 http_reply_file('./content/info/BingSiteAuth.xml', []),
                 []).
+
+
 
 
 file_reply(Dir, Opt, Request) :-
@@ -105,8 +109,8 @@ path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 serve_post_markdown(Request) :- serve_markdown(Request, posts).
 serve_info_markdown(Request) :- serve_markdown(Request, info).
 
-
-
+custom_404(Request) :- 
+    http_redirect(see_other, static('404.html'), Request).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %parse_metadata_from_file(File, Entry) :- .
 
