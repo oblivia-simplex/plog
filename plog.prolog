@@ -44,7 +44,10 @@ http:location(img, '/img', []).
 http:location(data, '/data', []).
 http:location(tags, '/tags', []).
 http:location(static, '/static', []).
-http:location(notfound, '/', [priority(0)]).
+http:location(feed, '/feed', []).
+http:location(sitemap, '/sitemap', []).
+http:location(notfound, '/', [priority(-9)]).
+http:location(bing, '/BingSiteAuth.xml', []).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
@@ -55,32 +58,37 @@ user:file_search_path(static, './content/static').
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
+%:- html_resource(root('rss.xml'), []).
+%:- html_resource(root('feed.xml'), []).
+%:- html_resource(root('feed'), []).
+%:- html_resource(root('sitemap'), []).
+%:- html_resource(root('sitemap.xml'), []).
+%:- html_resource(root('BingSiteAuth.xml'), []).
+
 
 %%%
 % Handlers
 %%
-:- http_handler(css(.), file_reply('./content/css', []), [prefix]).
-:- http_handler(img(.), file_reply('./content/img', []), [prefix]).
-:- http_handler(data(.), file_reply('./content/data', []), [prefix]).
-:- http_handler(static(.), file_reply('./content/static', []), [prefix]).
+:- http_handler(css(.), file_reply(css(/), []), [prefix]).
+:- http_handler(img(.), file_reply(img(/), []), [prefix]).
+:- http_handler(data(.), file_reply(data(/), []), [prefix]).
+:- http_handler(static(.), file_reply(static(/), []), [prefix]).
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
 :- http_handler(tags(.), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
-:- http_handler(notfound(.), custom_404, [prefix]).
+:- http_handler(root(.), serve_404, [prefix]).
 :- http_handler('/favicon.ico',
-                http_reply_file('./content/img/favicon.ico', []),
+                http_reply_file(img('favicon.ico'), []),
                 []).
 :- http_handler('/robots.txt',
-                http_reply_file('./content/info/robots.txt', []),
+                http_reply_file(info('robots.txt'), []),
                 []).
-:- http_handler('/feed', serve_rss, [prefix]).
-:- http_handler('/sitemap', serve_sitemap, [prefix]).
-:- http_handler('/sitemap.xml', serve_sitemap, [prefix]).
-:- http_handler('/BingSiteAuth.xml',
-                http_reply_file('./content/info/BingSiteAuth.xml', []),
-                []).
+:- http_handler(feed(.), serve_rss, [prefix]).
+:- http_handler(sitemap(.), serve_sitemap, [prefix]).
+:- http_handler(bing(.), http_reply_file(info('BingSiteAuth.xml'), []), []).
+%:- http_handler(notfound(.), serve_404, [prefix]).
 
 
 
@@ -89,7 +97,7 @@ file_reply(Dir, Opt, Request) :-
     http_reply_from_files(Dir, Opt, Request).
 
 file_reply(_, _, Request) :-
-    custom_404(Request).
+    serve_404(Request).
 
 serve_rss(_Request) :-
     make_rss(RSS),
@@ -225,6 +233,15 @@ serve_markdown(Request, Location) :-
     file_reply(PostDir, [], Request).
 
 
+serve_404(Request) :-
+  memberchk(path(Path), Request),
+  format('Status: 404~n'),
+  Message = div(['The requested URL ', code(Path), ' could not be found on this server.']),
+  reply_html_page(my_style,
+                  [title('Not Found'),
+                   meta('name="description", content="resource not found"')],
+                  [h1(class=error, 'Not Found'),
+                   div(id=post, Message)]).
 
 %%
 % The "secret" parameter that's required in order to display the
