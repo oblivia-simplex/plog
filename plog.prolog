@@ -34,9 +34,7 @@
 % This predicate starts the server in the background, and returns
 % to the toplevel, so that you can reload and debug the code, etc.
 server(Port) :-
-    http_server(http_dispatch, [port(Port)
-                                % ssl([]) % TODO
-                               ]). 
+    http_server(http_dispatch, [port(Port)]). 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 http:location(css, '/css', []).
@@ -328,8 +326,9 @@ see_cache(File, Blocks) :-
 %%%%% Entry point %%%%%
 
 start :-
+    about:bind(Address),
     about:port(Port),
-    server(Port).
+    server(Address:Port).
 
 update :-
     % Update the engine
