@@ -48,6 +48,10 @@ md_span_decorate(Span, Allow) -->
     { memberchk(del, Allow) },
     strikethrough(Span).
 
+md_span_decorate(Span, Allow) -->
+    { memberchk(span, Allow) },
+    obsidian_comment(Span).
+
 % Recognizes strikethrough ~~something~~.
 
 strikethrough(del(Codes)) -->
@@ -86,3 +90,9 @@ code(code(Trimmed)) -->
 code(code(Trimmed)) -->
     "`", string(Raw), "`",
     { trim(Raw, Trimmed) }.
+
+
+% Recognize Obsidian-style markdown comments %%Like So%%
+% and replace them with an empty span.
+obsidian_comment(span([])) -->
+  "%%", string(_), "%%".

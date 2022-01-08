@@ -35,8 +35,9 @@ md_span_string(String, HtmlTerms):-
 % by SWI-Prolog's html//1 predicate. More info:
 % http://www.swi-prolog.org/pldoc/doc_for?object=html/1
 
+% an obsidian comment becomes an empty span.
 md_span_codes(Codes, HtmlTerms):-
-    md_span_codes(Codes, [strong, em, code, del], HtmlTerms).
+    md_span_codes(Codes, [strong, em, code, del, span], HtmlTerms).
 
 md_span_codes(Codes, Allow, Out):-
     phrase(span(Spans, Allow), Codes), !,
@@ -159,7 +160,8 @@ span([Span|Spans], Allow) -->
         (   Code = 0'`
         ;   Code = 0'_
         ;   Code = 0'*
-        ;   Code = 0'~)
+        ;   Code = 0'~
+        ;   Code = 0'%)
     },
     md_span_decorate(Dec, Allow), !,
     {
