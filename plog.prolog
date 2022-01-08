@@ -78,7 +78,7 @@ user:file_search_path(static, './content/static').
 :- http_handler(tags(.), display_tags, []).
 :- http_handler(tags(.), display_toc, [prefix]).
 :- http_handler(root(.), display_toc, []).
-:- http_handler(root(.), serve_404, [prefix]).
+%:- http_handler(root(.), serve_404, [prefix]).
 :- http_handler('/favicon.ico',
                 http_reply_file(img('favicon.ico'), []),
                 []).
