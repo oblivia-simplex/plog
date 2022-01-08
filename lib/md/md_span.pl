@@ -95,6 +95,7 @@ span(['<'|Spans], Allow) -->
     "<", lookahead(Code),
     {
         \+ code_type(Code, alpha),
+        Code \= 33, % we want to allow comments. 33 is '!'
         Code \= 47
     }, !,
     span(Spans, Allow).
