@@ -1,3 +1,4 @@
+% vim: set expandtab syntax=prolog :
 :- module(timestamp, [last_build_date_of_file/3,
                       git_hash_of_file/3,
                       last_build_date_of_repo/1,

@@ -1,8 +1,11 @@
+% vim: set expandtab syntax=prolog :
+
 :- use_module(library(error)).
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_error)).
 :- use_module(library(http/http_log)).
+:- use_module(library(http/js_write)).
 :- use_module(library(http/http_parameters)).
 :- use_module(library(pio)).
 
@@ -48,6 +51,7 @@ http:location(feed, '/feed', []).
 http:location(sitemap, '/sitemap', []).
 http:location(notfound, '/', [priority(-9)]).
 http:location(bing, '/BingSiteAuth.xml', []).
+http:location(scripts, '/scripts', []).
 
 user:file_search_path(css, './content/css').
 user:file_search_path(posts, './content/posts').
@@ -55,6 +59,7 @@ user:file_search_path(info, './content/info').
 user:file_search_path(img, './content/img').
 user:file_search_path(data, './content/data').
 user:file_search_path(static, './content/static').
+user:file_search_path(scripts, './scripts'). % not in content/
 
 :- html_resource(css('stylesheet.css'), []).
 :- html_resource(root('favicon.ico'), []).
@@ -73,6 +78,7 @@ user:file_search_path(static, './content/static').
 :- http_handler(img(.), file_reply(img(/), []), [prefix]).
 :- http_handler(data(.), file_reply(data(/), []), [prefix]).
 :- http_handler(static(.), file_reply(static(/), []), [prefix]).
+:- http_handler(scripts(.), file_reply(scripts(/), []), [prefix]).
 :- http_handler(posts(.), serve_post_markdown, [prefix]).
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
@@ -274,6 +280,7 @@ get_tag_from_request(_, everything).
 % if the Tag is 'draft', then check for the magic word
 % in the parameter.
 display_toc(Request) :-
+    make, %% KLUDGE - rebuild the page when reloading %%
     get_tag_from_request(Request, Tag),
     user:file_search_path(posts, PostDir),
     make_toc(PostDir, ToC, Tag),
@@ -319,6 +326,7 @@ user:body(my_style, Body) -->
 user:head(my_style, Head) -->
     html(head([meta([name=viewport,
                      content='width=device-width, initial-scale=1.0']),
+               \html_requires(scripts('es5/tex-mml-chtml.js')),
                \html_requires(css('stylesheet.css')),
                Head])).
 
@@ -353,21 +361,3 @@ start :-
     about:bind(Address),
     about:port(Port),
     server(Address:Port).
-
-update :-
-    % Update the engine
-    process_create(path(git), [pull], [process(PID1)]),
-    process_wait(PID1, _),
-    % Now, update the blog content
-    working_directory(CWD, CWD),
-    atomic_list_concat([CWD, '/', content, '/', '.git'], ContentGitDir),
-    process_create(path(git), [
-                       '--git-dir', ContentGitDir,
-                       '-C', 'content/',
-                       pull
-                   ], [process(PID2)]),
-    process_wait(PID2, _),
-    toc_reader:reset_toc_globals,
-    format('~n~n'),
-    make.
-
