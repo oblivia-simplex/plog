@@ -6,7 +6,7 @@ if [ -z "$PORT" ] ; then
   if (( $(id -u) == 0 )) ; then
     PORT=80
   else
-    PORT=8080
+    PORT=9697
   fi
 fi
 
