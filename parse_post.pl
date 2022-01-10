@@ -1,3 +1,4 @@
+% vim: set expandtab syntax=prolog :
 :- module(parse_post, [parse_post/2,
                        parse_meta/2,
                        parse_post_with_meta/3,

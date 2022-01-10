@@ -1,3 +1,4 @@
+% vim: set expandtab syntax=prolog :
 :- module(rss, [make_rss/1, make_sitemap/1]).
 
 :- use_module('content/about').

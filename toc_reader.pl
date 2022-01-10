@@ -1,3 +1,4 @@
+% vim: set expandtab syntax=prolog :
 :- module(toc_reader, [dissect_entry/8,
                        make_toc/3,
                        make_tag/2,
