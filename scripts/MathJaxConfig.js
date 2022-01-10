@@ -2,7 +2,7 @@ MathJax = {
   tex: {
     packages: ['base'],        // extensions to use
     inlineMath: [              // start/end delimiter pairs for in-line math
-      [' $', '$ ']
+      ['$', '$']
     ],
     displayMath: [             // start/end delimiter pairs for display math
       ['$$', '$$'],
@@ -19,9 +19,9 @@ MathJax = {
     useLabelIds: true,         // use label name rather than tag for ids
     maxMacros: 1000,           // maximum number of macro substitutions per expression
     maxBuffer: 5 * 1024,       // maximum size for the internal TeX string (5K)
-    baseURL:                   // URL for use with links to tags (when there is a <base> tag in effect)
-       (document.getElementsByTagName('base').length === 0) ?
-        '' : String(document.location).replace(/#.*$/, '')),
+//    baseURL:                   // URL for use with links to tags (when there is a <base> tag in effect)
+//       (document.getElementsByTagName('base').length === 0) ?
+//        '' : String(document.location).replace(/#.*$/, '')),
     formatError:               // function called when TeX syntax errors occur
         (jax, err) => jax.formatError(err)
   }
