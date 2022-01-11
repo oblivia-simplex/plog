@@ -51,8 +51,8 @@ safe_base_and_parent_name(Path, Base, Parent) :-
 
 collapse_multiple_slashes(Path, CleanPath) :-
   atom_string(Path, PathS),
-  re_replace("//*", "/", PathS, CleanPath),
-  format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [PathS, CleanPath]),
+  re_replace("//*"/ga, "/", PathS, CleanPath),
+  %format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [PathS, CleanPath]),
   !.
 
 

@@ -82,7 +82,7 @@ entry_from_meta(Path, Meta, [file(Basename),
     meta_abstract(Meta, Abstract),
     meta_date(Meta, Date),
     meta_tags(Meta, Tags),
-    safe_base_and_parent_name(Path, Dir, Basename),
+    safe_base_and_parent_name(Path, Basename, Dir),
     fileinfo:git_authors(Dir, Basename, Editors),
     !.
 
