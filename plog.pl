@@ -11,11 +11,12 @@
 
 % http_reply_from_files is here
 :- use_module(library(http/http_files)).
+:- use_module(library(http/http_authenticate)).
 :- use_module(library(http/http_dirindex)).
 % for the DCG stuff, I think
 :- use_module(library(http/html_write)).
 % html_resource
-:- use_module(library(http/html_head)). 
+:- use_module(library(http/html_head)).
 :- use_module(library(lists)).
 
 :- use_module(parse_post).
@@ -37,7 +38,7 @@
 % This predicate starts the server in the background, and returns
 % to the toplevel, so that you can reload and debug the code, etc.
 server(Port) :-
-    http_server(http_dispatch, [port(Port)]). 
+    http_server(http_dispatch, [port(Port)]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 http:location(css, '/css', []).
@@ -48,7 +49,7 @@ http:location(data, '/data', []).
 http:location(tags, '/tags', []).
 http:location(static, '/static', []).
 http:location(feed, '/feed', []).
-http:location(sitemap, '/sitemap', []).
+http:location(sitemap, '/sitemap.xml', []).
 http:location(notfound, '/', [priority(-9)]).
 http:location(bing, '/BingSiteAuth.xml', []).
 http:location(scripts, '/scripts', []).
@@ -61,19 +62,11 @@ user:file_search_path(data, './content/data').
 user:file_search_path(static, './content/static').
 user:file_search_path(scripts, './scripts'). % not in content/
 
-:- html_resource(css('stylesheet.css'), []).
-:- html_resource(root('favicon.ico'), []).
-%:- html_resource(root('rss.xml'), []).
-%:- html_resource(root('feed.xml'), []).
-%:- html_resource(root('feed'), []).
-%:- html_resource(root('sitemap'), []).
-%:- html_resource(root('sitemap.xml'), []).
-%:- html_resource(root('BingSiteAuth.xml'), []).
-
-
 %%%
 % Handlers
 %%
+
+:- http_handler(root(.), serve_404, [prefix]).
 :- http_handler(css(.), file_reply(css(/), []), [prefix]).
 :- http_handler(img(.), file_reply(img(/), []), [prefix]).
 :- http_handler(data(.), file_reply(data(/), []), [prefix]).
@@ -83,18 +76,18 @@ user:file_search_path(scripts, './scripts'). % not in content/
 :- http_handler(info(.), serve_info_markdown, [prefix]).
 :- http_handler(tags(.), display_tags, []).
 :- http_handler(tags(.), display_toc, [prefix]).
-:- http_handler(root(.), display_toc, []).
-%:- http_handler(root(.), serve_404, [prefix]).
 :- http_handler('/favicon.ico',
                 http_reply_file(img('favicon.ico'), []),
                 []).
 :- http_handler('/robots.txt',
                 http_reply_file(info('robots.txt'), []),
                 []).
-:- http_handler(feed(.), serve_rss, [prefix]).
-:- http_handler(sitemap(.), serve_sitemap, [prefix]).
+:- http_handler(feed(.), serve_rss, []).
+:- http_handler(sitemap(.), serve_sitemap, []).
 :- http_handler(bing(.), http_reply_file(info('BingSiteAuth.xml'), []), []).
 %:- http_handler(notfound(.), serve_404, [prefix]).
+:- http_handler(root(.), display_toc, []).
+
 
 
 
@@ -123,23 +116,7 @@ path_of_request([_ | Tail], PathInfo) :- path_of_request(Tail, PathInfo).
 serve_post_markdown(Request) :- serve_markdown(Request, posts).
 serve_info_markdown(Request) :- serve_markdown(Request, info).
 
-custom_404(Request) :- 
-    http_redirect(see_other, static('404.html'), Request).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%parse_metadata_from_file(File, Entry) :- .
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-draftchk(File) :-
-    parse_meta(File, Entry),
-    memberchk(tag(Tags), Entry),
-    memberchk(draft, Tags),
-    !.
-
-cache_hash_key(Location, File, Commit, Key) :-
-    git_hash_of_file(Location, File, Commit),
-    atomic_list_concat([Location, '/', File, ':', Commit], Key),
-    !.
 
 % (+File, +Location, -Blocks, -Commit, -Entry)
 get_content(File, Location, Blocks, Commit, Entry) :-
@@ -205,7 +182,9 @@ make_header(Basename, Entry, Header) :-
 
 
 serve_markdown(Request, posts) :-
-    path_of_request(Request, Basename),
+    memberchk(path(Path), Request), %path_of_request(Request, Basename),
+    safe_base_and_parent_name(Path, Basename, posts),
+    format(user_error, "[serve_markdown] Path = ~s Basename = ~s~n", [Path, Basename]),
     file_name_extension(_, md, Basename),
     get_content(Basename, posts, PostBlocks, Commit, Entry),
     make_header(Basename, Entry, Header),
@@ -269,7 +248,7 @@ get_tag_from_request(Request, draft) :-
     get_secret(Secret),
     catch(http:http_parameters(Request, [secret(Secret, [] )]),
         error(existence_error(http_parameter, secret), _),
-        false). 
+        false).
 
 get_tag_from_request(Request, Tag) :-
     memberchk(path(Path), Request),
@@ -343,18 +322,16 @@ nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 nav('License', '/info/license.md').
 
 nav_bar -->
- 	  {
- 	      findall(Name, nav(Name, _), ButtonNames),
- 	      maplist(as_top_nav, ButtonNames, TopButtons)
- 	  },
- 	  html(TopButtons).
+	  {
+	      findall(Name, nav(Name, _), ButtonNames),
+	      maplist(as_top_nav, ButtonNames, TopButtons)
+	  },
+	  html(TopButtons).
 
 
 as_top_nav(Name, span([a([href=HREF, class=topnav], Name), &(nbsp), ' '])) :-
     nav(Name, HREF).
 
-see_cache(File, Blocks) :-
-    nb_current(File, Blocks).
 
 
 %%%%% Entry point %%%%%

@@ -102,7 +102,7 @@ parse_meta(Filename, Entry) :-
     raw_yaml_and_markdown(Filename, RawYaml, _RawMarkdown),
     parser:parse(RawYaml, Meta),
     entry_from_meta(Filename, Meta, Entry).
-    
+
 
 % (+Filename, -Html)
 parse_post(Filename, Html) :-

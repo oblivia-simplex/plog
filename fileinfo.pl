@@ -50,9 +50,9 @@ safe_base_and_parent_name(Path, Base, Parent) :-
   !.
 
 collapse_multiple_slashes(Path, CleanPath) :-
-  atom_string(Path, PathS),
-  re_replace("//*"/ga, "/", PathS, CleanPath),
-  %format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [PathS, CleanPath]),
+  %atom_string(Path, PathS),
+  re_replace('//*'/ga, '/', Path, CleanPath),
+  %format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [Path, CleanPath]),
   !.
 
 
@@ -60,7 +60,7 @@ collapse_multiple_slashes(Path, CleanPath) :-
 file_mod_date(File, Timestamp) :-
     time_file(File, Timestamp).
     %format_time(atom(IsoDate), '%FT%T', Timestamp).
-    
+
 last_build_date_of_file(Dir, File, TimeStamp) :-
   atomic_list_concat(['content/', Dir], WorkingDir),
   git([log, '-n1', '--pretty=format:%cI', File], [directory(WorkingDir), output(DateCodes)]),
