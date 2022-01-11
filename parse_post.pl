@@ -72,6 +72,7 @@ meta_tags(_, [draft]).
 entry_from_meta(Path, Meta, [file(Basename),
                            title(Title),
                            author(Author),
+                           editedby(Editors),
                            abstract(Abstract),
                            date(Date),
                            tags(Tags)]) :-
@@ -80,7 +81,11 @@ entry_from_meta(Path, Meta, [file(Basename),
     meta_abstract(Meta, Abstract),
     meta_date(Meta, Date),
     meta_tags(Meta, Tags),
-    file_base_name(Path, Basename).
+    file_directory_name(Path, FullDir),
+    file_base_name(FullDir, Dir),
+    file_base_name(Path, Basename),
+    fileinfo:git_authors(Dir, Basename, Editors),
+    !.
 
 
 % (+Filename, -Html, -Entry)

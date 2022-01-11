@@ -2,7 +2,7 @@
 :- module(rss, [make_rss/1, make_sitemap/1]).
 
 :- use_module('content/about').
-:- use_module(timestamp).
+:- use_module(fileinfo).
 :- use_module(toc_reader).
 
 escape_char([], []).

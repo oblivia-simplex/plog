@@ -1,5 +1,5 @@
 % vim: set expandtab syntax=prolog :
-:- module(timestamp, [last_build_date_of_file/3,
+:- module(fileinfo, [last_build_date_of_file/3,
                       git_hash_of_file/3,
                       last_build_date_of_repo/1,
                       file_mod_date/2,
@@ -71,4 +71,21 @@ prettify_date(TimeStamp, PrettyDate) :-
     format_time(atom(PrettyDate), "%F", TimeStamp).
 
 sitemap_date(IsoDate, SitemapDate) :- prettify_date(IsoDate, SitemapDate).
+
+
+
+
+%% Get all of the authors who have edited a piece
+git_authors(Dir, File, Authors) :-
+  atomic_list_concat(['content/', Dir], WorkingDir),
+  git([log, '--pretty=format:%aN', File], [directory(WorkingDir), output(NameCodes)]),
+  string_codes(NameString, NameCodes),
+  split_string(NameString, "\n", "", Names),
+  list_to_set(Names, UniqueNames),
+  %  maplist(atom_string, UniqueAuthors, UniqueNames),
+  atomics_to_string(UniqueNames, ', ', UniqueNamesConcat),
+  atom_string(UniqueNamesConcat, Authors),
+  !.
+
+git_authors(_,_,uncommitted).
 

@@ -22,7 +22,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % :- use_module(content/about).
-:- use_module(timestamp).
+:- use_module(fileinfo).
 :- use_module(rss).
 :- use_module(toc_reader).
 
@@ -184,7 +184,8 @@ make_header(Basename, Entry, Header) :-
     ; TitleLine = [Title]),
     last_build_date_of_file(posts, Basename, RevisedDate),
     prettify_date(RevisedDate, PrettyRevisedDate),
-    format(atom(RevisedDateLine), 'Edited: ~s', [PrettyRevisedDate]),
+    memberchk(editedby(Editors), Entry),
+    format(atom(RevisedDateLine), 'Edited: ~s (~s)', [PrettyRevisedDate, Editors]),
     format(atom(WordLine), '~d words', WordCount),
     maplist(make_tag, Tags, TagLine),
     Header = [

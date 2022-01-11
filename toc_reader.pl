@@ -18,7 +18,7 @@
 :- use_module(lib/yaml/util).
 :- use_module(lib/yaml/serializer).
 %
-:- use_module(timestamp).
+:- use_module(fileinfo).
 
 
 resolve_author(me, Me) :- content:about:admin(Me).
