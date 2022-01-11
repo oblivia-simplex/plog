@@ -3,6 +3,10 @@
                       git_hash_of_file/3,
                       last_build_date_of_repo/1,
                       file_mod_date/2,
+                      safe_directory_name/2,
+                      safe_base_name/2,
+                      safe_parent_name/2,
+                      safe_base_and_parent_name/3,
                       rfc2822_date/2,
                       mod_date_or_today/2,
                       sitemap_date/2,
@@ -10,6 +14,7 @@
                       prettify_date/2]).
 
 use_module(library(git)).
+use_module(library(pcre)).
 % Add a predicate to adjust the timezone
 % and have the local timezone set in either about.prolog, or consult
 % the OS.
@@ -18,6 +23,37 @@ use_module(library(git)).
 
 exists_path(P) :- exists_file(P).
 exists_path(P) :- exists_directory(P).
+
+
+% better functions for dir name and base name to avoid // bugs
+safe_directory_name(Path, Dir) :-
+  collapse_multiple_slashes(Path, CleanPath),
+  file_directory_name(CleanPath, Dir),
+  !.
+
+safe_base_name(Path, Base) :-
+  collapse_multiple_slashes(Path, CleanPath),
+  file_base_name(CleanPath, Base),
+  !.
+
+safe_parent_name(Path, Parent) :-
+  collapse_multiple_slashes(Path, CleanPath),
+  file_directory_name(CleanPath, Dir),
+  file_base_name(Dir, Parent),
+  !.
+
+safe_base_and_parent_name(Path, Base, Parent) :-
+  collapse_multiple_slashes(Path, CleanPath),
+  file_directory_name(CleanPath, Dir),
+  file_base_name(Dir, Parent),
+  file_base_name(CleanPath, Base),
+  !.
+
+collapse_multiple_slashes(Path, CleanPath) :-
+  atom_string(Path, PathS),
+  re_replace("//*", "/", PathS, CleanPath),
+  format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [PathS, CleanPath]),
+  !.
 
 
 %% cheat, and just take the file modification date

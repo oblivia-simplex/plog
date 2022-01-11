@@ -7,6 +7,7 @@
 
 :- use_module(lib/yaml/parser).
 :- use_module(lib/md/md_parse).
+:- use_module(fileinfo).
 %:- use_module(library(pldoc)).
 % This is a bit of a hack.
 
@@ -81,9 +82,7 @@ entry_from_meta(Path, Meta, [file(Basename),
     meta_abstract(Meta, Abstract),
     meta_date(Meta, Date),
     meta_tags(Meta, Tags),
-    file_directory_name(Path, FullDir),
-    file_base_name(FullDir, Dir),
-    file_base_name(Path, Basename),
+    safe_base_and_parent_name(Path, Dir, Basename),
     fileinfo:git_authors(Dir, Basename, Editors),
     !.
 
