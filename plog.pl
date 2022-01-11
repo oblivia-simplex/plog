@@ -184,7 +184,7 @@ make_header(Basename, Entry, Header) :-
 serve_markdown(Request, posts) :-
     memberchk(path(Path), Request), %path_of_request(Request, Basename),
     safe_base_and_parent_name(Path, Basename, posts),
-    format(user_error, "[serve_markdown] Path = ~s Basename = ~s~n", [Path, Basename]),
+    %format(user_error, "[serve_markdown] Path = ~s Basename = ~s~n", [Path, Basename]),
     file_name_extension(_, md, Basename),
     get_content(Basename, posts, PostBlocks, Commit, Entry),
     make_header(Basename, Entry, Header),
