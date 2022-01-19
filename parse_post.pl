@@ -135,6 +135,7 @@ fullpaths(Dir, [File|Fs], [Path|Ps]) :-
 assemble_toc(Dir, Entries) :-
     directory_files(Dir, Files),
     include(is_md, Files, MarkdownFiles),
-    fullpaths(Dir, MarkdownFiles, Paths),
+    fullpaths(Dir, MarkdownFiles, AllPaths),
+    include(exists_file, AllPaths, Paths),
     parse_meta_list(Paths, Entries),
     !.
