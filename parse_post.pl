@@ -132,10 +132,13 @@ fullpaths(Dir, [File|Fs], [Path|Ps]) :-
     fullpaths(Dir, Fs, Ps),
     !.
 
+is_symlink(Path) :-
+  read_link(Path, _, _).
+
 assemble_toc(Dir, Entries) :-
     directory_files(Dir, Files),
     include(is_md, Files, MarkdownFiles),
     fullpaths(Dir, MarkdownFiles, AllPaths),
-    include(exists_file, AllPaths, Paths),
+    exclude(is_symlink, AllPaths, Paths),
     parse_meta_list(Paths, Entries),
     !.
