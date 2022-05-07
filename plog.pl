@@ -66,7 +66,7 @@ user:file_search_path(scripts, './scripts'). % not in content/
 % Handlers
 %%
 
-:- http_handler(root(.), serve_404, [prefix]).
+%:- http_handler(root(.), serve_404, [prefix]).
 :- http_handler(css(.), file_reply(css(/), []), [prefix]).
 :- http_handler(img(.), file_reply(img(/), []), [prefix]).
 :- http_handler(data(.), file_reply(data(/), []), [prefix]).
