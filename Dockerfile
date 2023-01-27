@@ -10,6 +10,6 @@ COPY . /www
 
 WORKDIR /www
 
-EXPOSE 80
+EXPOSE 9697
 
 CMD screen swipl -l plog.pl -g start
