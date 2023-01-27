@@ -60,6 +60,8 @@ author: me
 ---
 ```
 
+If you attach the special tag `draft` to a post, then it won't show up in the table of contents, but anyone who knows the URL will still be able to navigate there directly. Think of it as a privacy hedge, not a brick wall.
+
 The CSS files should go in `content/css`. Use the examples given as a template,
 and work from there, until things look the way you'd like. 
 

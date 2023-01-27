@@ -1,9 +1,12 @@
 ---
 title: Cum Amori
 author: Janet Jackson
-abstract: I want to see if I can get this YAML header thing to work.
+abstract: "I want to see if I can get this YAML header thing to work."
 date: 1983-12-23
-tags: [draft, lorem, fake]
+tags: 
+- draft
+- lorem
+- fake
 ---
 
 # Cum amori
