@@ -316,7 +316,7 @@ nav('Home', /).
 nav('About', '/info/about.md').
 nav('Tags', '/tags').
 nav('Links', '/info/links.md').
-nav('Storage', '/data/').
+% nav('Storage', '/data/'). % why list when dir listing is blocked?
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
 
