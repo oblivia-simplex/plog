@@ -1,4 +1,4 @@
-IMAGE=plog
+IMAGE=pseudosue/plog
 
 all: $(IMAGE)
 

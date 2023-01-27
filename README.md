@@ -118,7 +118,7 @@ available, P'log will use it to update metadata on the posts.
 ## Using Docker
 
 If you want to run P'Log in a Docker container, you can do so easily. Just run
-`make`, and then use the `plogserve.sh` script, like so:
+the `plogserve.sh` script, like so:
 
 ```
 $ ./plogserve.sh $PATH_TO_YOUR_BLOG $BIND_ADDRESS $PORT
