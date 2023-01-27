@@ -22,7 +22,7 @@ if [ -z "$port" ]; then
     port="9697"
 fi
 
-echo "=== Serving $blog_path on $port ===" >&2
+echo "=== Serving $blog_path on $bind:$port ===" >&2
 
 docker run --rm -tid \
   -v "$blog_path":/www/content \
