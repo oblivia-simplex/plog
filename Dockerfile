@@ -1,7 +1,7 @@
 FROM swipl:latest
 
 RUN apt-get update && \
-  apt-get install -y git screen && \
+  apt-get install -y git tmux && \
   rm -rf /var/lib/apt/lists
 
 RUN mkdir /www
@@ -12,4 +12,4 @@ WORKDIR /www
 
 EXPOSE 9697
 
-CMD screen swipl -l plog.pl -g start
+CMD tmux new-session swipl -l plog.pl -g start
