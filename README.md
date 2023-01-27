@@ -111,9 +111,8 @@ making whatever adjustments you see fit:
 It's expected that you will be running P'log from the directory into which
 you have cloned its git repository, and that the data that makes up the
 meat of your blog will live in its own git repo, under `./content/`. This
-is strictly necessary at this point, since P'log will expect to retrieve
-git information from time to time. Maybe I'll loosen this constraint in the
-future.
+is shouldn't be strictly necessary at this point, but if git information is
+available, P'log will use it to update metadata on the posts.
 
 
 ## Using Docker

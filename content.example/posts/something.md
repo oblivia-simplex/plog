@@ -2,7 +2,7 @@
 title: Mind Flayers
 author: Janet Jackson
 abstract: They are extremely dangerous.
-date: 1988-2-23
+date: 1988-02-23
 tags: [mindflayers, danger, watchout]
 ---
 

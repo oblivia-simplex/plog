@@ -63,10 +63,9 @@ file_mod_date(File, Timestamp) :-
 
 last_build_date_of_file(Dir, File, TimeStamp) :-
   atomic_list_concat(['content/', Dir], WorkingDir),
-  git([log, '-n1', '--pretty=format:%cI', File], [directory(WorkingDir), output(DateCodes)]),
-  atom_codes(IsoDate, DateCodes),
-  parse_time(IsoDate, TimeStamp),
-  !.
+  catch((git([log, '-n1', '--pretty=format:%cI', File], [directory(WorkingDir), output(DateCodes)]), atom_codes(IsoDate, DateCodes), parse_time(IsoDate, TimeStamp)),
+   _, ( TimeStamp = 0 )),
+   !.
 
 last_build_date_of_file(Dir, File, TimeStamp) :-
   atomic_list_concat(['content/', Dir, '/', File], Path),
@@ -74,7 +73,7 @@ last_build_date_of_file(Dir, File, TimeStamp) :-
 
 git_hash_of_file(Dir, File, Hash) :-
     atomic_list_concat(['content/', Dir], WorkingDir),
-    git([log, '-n1', '--pretty=format:%H', File], [directory(WorkingDir), output(HashCodes)]),
+    catch(git([log, '-n1', '--pretty=format:%H', File], [directory(WorkingDir), output(HashCodes)]), _, ( HashCodes = [] ) ),
     atom_codes(Hash, HashCodes),
     !.
 
@@ -114,14 +113,16 @@ sitemap_date(IsoDate, SitemapDate) :- prettify_date(IsoDate, SitemapDate).
 %% Get all of the authors who have edited a piece
 git_authors(Dir, File, Authors) :-
   atomic_list_concat(['content/', Dir], WorkingDir),
-  git([log, '--pretty=format:%aN', File], [directory(WorkingDir), output(NameCodes)]),
+  catch(git([log, '--pretty=format:%aN', File], 
+            [directory(WorkingDir), output(NameCodes)]),
+        _, (NameCodes = []) ),
   string_codes(NameString, NameCodes),
   split_string(NameString, "\n", "", Names),
   list_to_set(Names, UniqueNames),
   %  maplist(atom_string, UniqueAuthors, UniqueNames),
   atomics_to_string(UniqueNames, ', ', UniqueNamesConcat),
-  atom_string(UniqueNamesConcat, Authors),
-  !.
+  atom_string(UniqueNamesConcat, Authors).
+  
 
 git_authors(_,_,uncommitted).
 
