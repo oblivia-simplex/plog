@@ -12,4 +12,4 @@ WORKDIR /www
 
 EXPOSE 80
 
-CMD screen swipl -l plog.prolog -g 'server(80)'
+CMD screen swipl -l plog.pl -g start
