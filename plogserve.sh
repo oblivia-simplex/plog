@@ -22,10 +22,12 @@ if [ -z "$port" ]; then
     port="9697"
 fi
 
-echo "=== Serving $blog_path on $bind:$port ===" >&2
+name="$(basename "$blog_path" | tr -dc 'A-Za-z0-9_')_$(printf "%04x" ${RANDOM})_plog"
+
+echo "=== Serving $blog_path on $bind:$port in container $name ===" >&2
 
 docker run --rm -tid \
   -v "$blog_path":/www/content \
   -p $bind:$port:9697 \
-  --name $(basename "$blog_path" | tr -dc 'A-Za-z0-9_')_plog \
+  --name $name \
   pseudosue/plog
