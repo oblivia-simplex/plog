@@ -113,8 +113,19 @@ is strictly necessary at this point, since P'log will expect to retrieve
 git information from time to time. Maybe I'll loosen this constraint in the
 future.
 
+
+## Using Docker
+
+If you want to run P'Log in a Docker container, you can do so easily. Just run
+`make`, and then use the `plogserve.sh` script, like so:
+
+```
+$ ./plogserve.sh $PATH_TO_YOUR_BLOG $BIND_ADDRESS $PORT
+```
+
 # Blogs Powered by P'Log
 
 This list is complete. You can help by adding to it. 
 
 1. [Feral Machines](http://feralmachin.es)
+
