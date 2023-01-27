@@ -319,7 +319,6 @@ nav('Links', '/info/links.md').
 nav('Storage', '/data/').
 nav('RSS', '/feed').
 nav('P\'log', 'https://github.com/oblivia-simplex/plog').
-nav('License', '/info/license.md').
 
 nav_bar -->
 	  {
