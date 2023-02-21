@@ -41,7 +41,7 @@ rss_xml_header([
                   ]) :-
     content:about:title(UnescTitle),
     content:about:domain(UnescDomain),
-    content:about:abstract(UnescDesc),
+    content:about:motto(UnescDesc),
     escape_xml_atom(UnescTitle, Title),
     escape_xml_atom(UnescDomain, Domain),
     escape_xml_atom(UnescDesc, Description),

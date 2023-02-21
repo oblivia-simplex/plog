@@ -8,7 +8,8 @@
 :- use_module(library(http/js_write)).
 :- use_module(library(http/http_parameters)).
 :- use_module(library(pio)).
-
+:- use_module(library(dcg/basics)).
+:- use_module(library(readutil)).
 % http_reply_from_files is here
 :- use_module(library(http/http_files)).
 :- use_module(library(http/http_authenticate)).
@@ -288,16 +289,34 @@ toc_page_content(ToC) -->
 tag_page_content(Tags) -->
     html([h1('Tags'), div(class(tag_list), Tags)]).
 
+
+
+
+get_motto(Motto) :-
+    content:about:motto(MottoA),
+    % Check if the motto is a valid file path, relative to ./content/, and if it is, choose a random line from it.
+    (   ( format(atom(MottoPath), './content/~s', [MottoA]),
+          exists_file(MottoPath) )
+    ->  read_file_to_string(MottoPath, String, []),
+        split_string(String, "\n", "", Lines),
+        % filter out any empty lines
+        exclude(=(""), Lines, NonEmptyLines),
+        random_member(Line, NonEmptyLines),
+        format(atom(Motto), '~s', [Line])
+    ;   format(atom(Motto), '~s', [MottoA])
+    ).
+    
+
 user:body(my_style, Body) -->
     {
         content:about:title(Title),
-        content:about:abstract(Abstract)
+        get_motto(Motto)
     },
     html(body([div(class(container),
                    [div(id(main),
                         [h1(Title),
                          hr(_),
-                         p(class(abstract), Abstract),
+                         p(class(motto), Motto),
                          \nav_bar,
                          hr(_),
                          br(_),

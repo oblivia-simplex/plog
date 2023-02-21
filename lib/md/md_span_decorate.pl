@@ -52,6 +52,10 @@ md_span_decorate(Span, Allow) -->
     { memberchk(span, Allow) },
     obsidian_comment(Span).
 
+md_span_decorate(Span, Allow) -->
+    { memberchk(span, Allow) },
+    highlight(Span).
+
 % Recognizes strikethrough ~~something~~.
 
 strikethrough(del(Codes)) -->
@@ -67,7 +71,7 @@ star_strong(strong(Codes)) -->
 underscore_strong(strong(Codes)) -->
     "__", string(Codes), "__".
 
-% Recognizes emhasis *something*.
+% Recognizes emphasis *something*.
 % The first character following * must be a non-space.
 
 star_emphasis(em([Code|Codes])) -->
@@ -96,3 +100,8 @@ code(code(Trimmed)) -->
 % and replace them with an empty span.
 obsidian_comment(span([])) -->
   "%%", string(_), "%%".
+
+
+% Recognizes highlighted text ==highlighted==.
+highlight(span(Codes)) -->
+    "==", string(Codes), "==".

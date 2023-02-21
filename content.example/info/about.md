@@ -1,3 +1,10 @@
+---
+author: me
+title: "About this Blog"
+tags: about
+abstract: an introduction
+---
+
 # About this Blog
 
 ## Et ancora abdita iactatis nostro

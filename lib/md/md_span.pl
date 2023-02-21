@@ -161,6 +161,7 @@ span([Span|Spans], Allow) -->
         ;   Code = 0'_
         ;   Code = 0'*
         ;   Code = 0'~
+        ;   Code = 0'=
         ;   Code = 0'%)
     },
     md_span_decorate(Dec, Allow), !,
