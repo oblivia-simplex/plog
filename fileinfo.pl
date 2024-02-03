@@ -50,10 +50,14 @@ safe_base_and_parent_name(Path, Base, Parent) :-
   !.
 
 collapse_multiple_slashes(Path, CleanPath) :-
-  %atom_string(Path, PathS),
-  re_replace('//*'/ga, '/', Path, CleanPath),
-  %format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [Path, CleanPath]),
-  !.
+    % atom_string(Path, PathS),
+    % re_replace('//*'/ga, '/', Path, CleanPath),
+    % KLUDGE: getting errors saying that re_replace is an unknown procedure
+    % but we also don't really seem to need this function anyway, so let's
+    % replace it with a dummy no-op.
+    CleanPath = Path,
+    % format(user_error, '[collapse_multiple_slashes] "~s" --> "~s"~n', [Path, CleanPath]),
+    !.
 
 
 %% cheat, and just take the file modification date
